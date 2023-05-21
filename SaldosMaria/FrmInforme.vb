@@ -3,6 +3,7 @@
 
 
 Public Class FrmInforme
+    Dim TablaDT As New DataTable
 
     Private Sub FrmInforme_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         CARGARINFORME()
@@ -45,7 +46,7 @@ Public Class FrmInforme
                     If dr("NroDeposito").ToString = dr2("DepositoUsado").ToString Then
                         Dim FechDesp As Date = dr2("FechaOficializacion").ToString
                         Dim Referenciapordespacho As String = ""
-                        For Each drw As DataRow In FrmSaldosMaria.TablaDT.Rows
+                        For Each drw As DataRow In TablaDT.Rows
 
                             If dr2("Numerodespacho").ToString = drw("Despacho").ToString Then
                                 Referenciapordespacho = drw("Cliente").ToString
@@ -129,29 +130,5 @@ Public Class FrmInforme
     End Sub
 
 
-    'Public Function ObtenerIdPropio(ByVal despacho As String) As String
-    '    Dim CN As New MySqlConnection(My.Settings.Copygece)
-    '    Dim CMCOMP As New MySqlCommand("SELECT COMPRADOR_VENDEDOR FROM oficializado WHERE DESPACHO='" & despacho & "'", CN)
-
-    '    Dim Desp As String
-
-    '    CN.Open()
-    '    Desp = CMCOMP.ExecuteScalar
-    '    CN.Close()
-
-    '    Try
-    '        If Len(Desp) > 10 Then
-    '            Desp = Desp.Substring(Desp.LastIndexOf("CT-") - 2).ToString
-
-    '        End If
-    '    Catch ex As Exception
-
-    '    End Try
-
-
-    '    Return Desp
-
-
-    'End Function
 
 End Class

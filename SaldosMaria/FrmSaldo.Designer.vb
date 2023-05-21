@@ -32,21 +32,18 @@ Partial Class FrmSaldosMaria
         Me.BtnDeposito = New System.Windows.Forms.Button()
         Me.BtnInforme = New System.Windows.Forms.Button()
         Me.DgvVep = New System.Windows.Forms.DataGridView()
-        Me.Referencia = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Despacho = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.FechaOf = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.NroVep = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.ImporteAfectado = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.BtnSeleccionar = New System.Windows.Forms.Button()
         Me.txtPath = New System.Windows.Forms.TextBox()
-        Me.BtnExcel = New System.Windows.Forms.Button()
-        Me.DgvExcel = New System.Windows.Forms.DataGridView()
         Me.BtnActualizar = New System.Windows.Forms.Button()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.Button2 = New System.Windows.Forms.Button()
+        Me.DataGridView1 = New System.Windows.Forms.DataGridView()
+        Me.MTxdesde = New System.Windows.Forms.MaskedTextBox()
+        Me.MTxHasta = New System.Windows.Forms.MaskedTextBox()
+        Me.BtnBusca = New System.Windows.Forms.Button()
         CType(Me.DgvSaldos, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DgvVep, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.DgvExcel, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'DgvSaldos
@@ -58,7 +55,7 @@ Partial Class FrmSaldosMaria
         Me.DgvSaldos.Location = New System.Drawing.Point(593, 54)
         Me.DgvSaldos.Name = "DgvSaldos"
         Me.DgvSaldos.ReadOnly = True
-        Me.DgvSaldos.Size = New System.Drawing.Size(470, 563)
+        Me.DgvSaldos.Size = New System.Drawing.Size(470, 268)
         Me.DgvSaldos.TabIndex = 0
         '
         'Fecha
@@ -94,14 +91,14 @@ Partial Class FrmSaldosMaria
         '
         'TxtTotalMaria
         '
-        Me.TxtTotalMaria.Location = New System.Drawing.Point(968, 625)
+        Me.TxtTotalMaria.Location = New System.Drawing.Point(963, 330)
         Me.TxtTotalMaria.Name = "TxtTotalMaria"
         Me.TxtTotalMaria.Size = New System.Drawing.Size(100, 20)
         Me.TxtTotalMaria.TabIndex = 2
         '
         'BtnDeposito
         '
-        Me.BtnDeposito.Location = New System.Drawing.Point(718, 623)
+        Me.BtnDeposito.Location = New System.Drawing.Point(593, 328)
         Me.BtnDeposito.Name = "BtnDeposito"
         Me.BtnDeposito.Size = New System.Drawing.Size(130, 23)
         Me.BtnDeposito.TabIndex = 3
@@ -110,7 +107,7 @@ Partial Class FrmSaldosMaria
         '
         'BtnInforme
         '
-        Me.BtnInforme.Location = New System.Drawing.Point(12, 622)
+        Me.BtnInforme.Location = New System.Drawing.Point(12, 328)
         Me.BtnInforme.Name = "BtnInforme"
         Me.BtnInforme.Size = New System.Drawing.Size(75, 23)
         Me.BtnInforme.TabIndex = 4
@@ -122,36 +119,10 @@ Partial Class FrmSaldosMaria
         Me.DgvVep.AllowUserToAddRows = False
         Me.DgvVep.AllowUserToDeleteRows = False
         Me.DgvVep.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DgvVep.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Referencia, Me.Despacho, Me.FechaOf, Me.NroVep, Me.ImporteAfectado})
         Me.DgvVep.Location = New System.Drawing.Point(12, 54)
         Me.DgvVep.Name = "DgvVep"
-        Me.DgvVep.Size = New System.Drawing.Size(552, 562)
+        Me.DgvVep.Size = New System.Drawing.Size(552, 268)
         Me.DgvVep.TabIndex = 5
-        '
-        'Referencia
-        '
-        Me.Referencia.HeaderText = "Referencia"
-        Me.Referencia.Name = "Referencia"
-        '
-        'Despacho
-        '
-        Me.Despacho.HeaderText = "Despacho"
-        Me.Despacho.Name = "Despacho"
-        '
-        'FechaOf
-        '
-        Me.FechaOf.HeaderText = "FechaOf"
-        Me.FechaOf.Name = "FechaOf"
-        '
-        'NroVep
-        '
-        Me.NroVep.HeaderText = "NroVep"
-        Me.NroVep.Name = "NroVep"
-        '
-        'ImporteAfectado
-        '
-        Me.ImporteAfectado.HeaderText = "ImporteAfectado"
-        Me.ImporteAfectado.Name = "ImporteAfectado"
         '
         'BtnSeleccionar
         '
@@ -169,27 +140,9 @@ Partial Class FrmSaldosMaria
         Me.txtPath.Size = New System.Drawing.Size(309, 20)
         Me.txtPath.TabIndex = 8
         '
-        'BtnExcel
-        '
-        Me.BtnExcel.Location = New System.Drawing.Point(215, 625)
-        Me.BtnExcel.Name = "BtnExcel"
-        Me.BtnExcel.Size = New System.Drawing.Size(195, 23)
-        Me.BtnExcel.TabIndex = 12
-        Me.BtnExcel.Text = "BAJAR EXCEL CE DESPACHOS"
-        Me.BtnExcel.UseVisualStyleBackColor = True
-        '
-        'DgvExcel
-        '
-        Me.DgvExcel.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DgvExcel.Location = New System.Drawing.Point(1031, 54)
-        Me.DgvExcel.Name = "DgvExcel"
-        Me.DgvExcel.Size = New System.Drawing.Size(32, 150)
-        Me.DgvExcel.TabIndex = 13
-        Me.DgvExcel.Visible = False
-        '
         'BtnActualizar
         '
-        Me.BtnActualizar.Location = New System.Drawing.Point(494, 622)
+        Me.BtnActualizar.Location = New System.Drawing.Point(489, 328)
         Me.BtnActualizar.Name = "BtnActualizar"
         Me.BtnActualizar.Size = New System.Drawing.Size(75, 23)
         Me.BtnActualizar.TabIndex = 14
@@ -214,16 +167,53 @@ Partial Class FrmSaldosMaria
         Me.Button2.Text = "Imagen"
         Me.Button2.UseVisualStyleBackColor = True
         '
+        'DataGridView1
+        '
+        Me.DataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.DataGridView1.Location = New System.Drawing.Point(12, 412)
+        Me.DataGridView1.Name = "DataGridView1"
+        Me.DataGridView1.Size = New System.Drawing.Size(552, 220)
+        Me.DataGridView1.TabIndex = 17
+        '
+        'MTxdesde
+        '
+        Me.MTxdesde.Location = New System.Drawing.Point(12, 386)
+        Me.MTxdesde.Mask = "00/00/0000"
+        Me.MTxdesde.Name = "MTxdesde"
+        Me.MTxdesde.Size = New System.Drawing.Size(100, 20)
+        Me.MTxdesde.TabIndex = 18
+        Me.MTxdesde.ValidatingType = GetType(Date)
+        '
+        'MTxHasta
+        '
+        Me.MTxHasta.Location = New System.Drawing.Point(118, 386)
+        Me.MTxHasta.Mask = "00/00/0000"
+        Me.MTxHasta.Name = "MTxHasta"
+        Me.MTxHasta.Size = New System.Drawing.Size(100, 20)
+        Me.MTxHasta.TabIndex = 19
+        Me.MTxHasta.ValidatingType = GetType(Date)
+        '
+        'BtnBusca
+        '
+        Me.BtnBusca.Location = New System.Drawing.Point(224, 384)
+        Me.BtnBusca.Name = "BtnBusca"
+        Me.BtnBusca.Size = New System.Drawing.Size(75, 23)
+        Me.BtnBusca.TabIndex = 20
+        Me.BtnBusca.Text = "Busca"
+        Me.BtnBusca.UseVisualStyleBackColor = True
+        '
         'FrmSaldosMaria
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1075, 660)
+        Me.Controls.Add(Me.BtnBusca)
+        Me.Controls.Add(Me.MTxHasta)
+        Me.Controls.Add(Me.MTxdesde)
+        Me.Controls.Add(Me.DataGridView1)
         Me.Controls.Add(Me.Button2)
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.BtnActualizar)
-        Me.Controls.Add(Me.DgvExcel)
-        Me.Controls.Add(Me.BtnExcel)
         Me.Controls.Add(Me.txtPath)
         Me.Controls.Add(Me.BtnSeleccionar)
         Me.Controls.Add(Me.DgvVep)
@@ -237,7 +227,7 @@ Partial Class FrmSaldosMaria
         Me.Text = "SALDOS MARIA"
         CType(Me.DgvSaldos, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DgvVep, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.DgvExcel, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -247,11 +237,6 @@ Partial Class FrmSaldosMaria
     Friend WithEvents BtnDeposito As System.Windows.Forms.Button
     Friend WithEvents BtnInforme As System.Windows.Forms.Button
     Friend WithEvents DgvVep As System.Windows.Forms.DataGridView
-    Friend WithEvents Referencia As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents Despacho As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents FechaOf As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents NroVep As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents ImporteAfectado As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents BtnSeleccionar As System.Windows.Forms.Button
     Friend WithEvents txtPath As System.Windows.Forms.TextBox
     Friend WithEvents Fecha As System.Windows.Forms.DataGridViewTextBoxColumn
@@ -259,9 +244,11 @@ Partial Class FrmSaldosMaria
     Friend WithEvents Importe As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents Saldo As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents Id As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents BtnExcel As System.Windows.Forms.Button
-    Friend WithEvents DgvExcel As System.Windows.Forms.DataGridView
     Friend WithEvents BtnActualizar As System.Windows.Forms.Button
     Friend WithEvents Button1 As System.Windows.Forms.Button
     Friend WithEvents Button2 As Button
+    Friend WithEvents DataGridView1 As DataGridView
+    Friend WithEvents MTxdesde As MaskedTextBox
+    Friend WithEvents MTxHasta As MaskedTextBox
+    Friend WithEvents BtnBusca As Button
 End Class
