@@ -81,7 +81,7 @@ Public Class FrmSaldosMaria
                 .Multiselect = False
                 .InitialDirectory = My.Computer.FileSystem.SpecialDirectories.MyDocuments
                 If .ShowDialog = Windows.Forms.DialogResult.OK Then
-                    txtPath.Text = .FileName
+                    Insertardesdexls(.FileName)
                 Else
                     openFD.Dispose()
                 End If
@@ -104,7 +104,7 @@ Public Class FrmSaldosMaria
         ad.Fill(dt)
         mconn.Close()
 
-        DgvVep.DataSource = dt
+        Dgvdat.DataSource = dt
 
 
         'If DgvVep.RowCount > 0 Then
@@ -154,7 +154,7 @@ Public Class FrmSaldosMaria
         mconn.Close()
 
 
-        For Each drw As DataGridViewRow In DgvVep.Rows
+        For Each drw As DataGridViewRow In Dgvdat.Rows
             For Each dr As DataRow In Dt.Rows
 
 
@@ -206,7 +206,7 @@ Public Class FrmSaldosMaria
         Return True
     End Function
     Private Sub BtnActualizar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BtnActualizar.Click
-        For Each drw As DataGridViewRow In DgvVep.Rows
+        For Each drw As DataGridViewRow In Dgvdat.Rows
             Dim fech As Date = drw.Cells("FechaOf").Value
             Dim ImporteSaldo As String = "0"
 
@@ -218,7 +218,8 @@ Public Class FrmSaldosMaria
             ActualizarVep(fech, drw.Cells("Despacho").Value, drw.Cells("NroVep").Value, drw.Cells("ImporteAfectado").Value, ImporteSaldo)
             Me.CARGARDEPOSITOS()
         Next
-        DgvVep.Rows.Clear()
+        Dgvdat.Rows.Clear()
+
 
 
     End Sub
@@ -259,7 +260,7 @@ Public Class FrmSaldosMaria
         End If
     End Sub
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
-        If DgvVep.RowCount > 0 Then
+        If Dgvdat.RowCount > 0 Then
             CargarPlanillaCatalent()
         Else
             MsgBox("Primero carga el excel")

@@ -31,7 +31,6 @@ Partial Class FrmSaldosMaria
         Me.TxtTotalMaria = New System.Windows.Forms.TextBox()
         Me.BtnDeposito = New System.Windows.Forms.Button()
         Me.BtnInforme = New System.Windows.Forms.Button()
-        Me.DgvVep = New System.Windows.Forms.DataGridView()
         Me.BtnSeleccionar = New System.Windows.Forms.Button()
         Me.txtPath = New System.Windows.Forms.TextBox()
         Me.BtnActualizar = New System.Windows.Forms.Button()
@@ -41,9 +40,10 @@ Partial Class FrmSaldosMaria
         Me.MTxdesde = New System.Windows.Forms.MaskedTextBox()
         Me.MTxHasta = New System.Windows.Forms.MaskedTextBox()
         Me.BtnBusca = New System.Windows.Forms.Button()
+        Me.Dgvdat = New System.Windows.Forms.DataGridView()
         CType(Me.DgvSaldos, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.DgvVep, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Dgvdat, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'DgvSaldos
@@ -113,16 +113,6 @@ Partial Class FrmSaldosMaria
         Me.BtnInforme.TabIndex = 4
         Me.BtnInforme.Text = "Informe"
         Me.BtnInforme.UseVisualStyleBackColor = True
-        '
-        'DgvVep
-        '
-        Me.DgvVep.AllowUserToAddRows = False
-        Me.DgvVep.AllowUserToDeleteRows = False
-        Me.DgvVep.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DgvVep.Location = New System.Drawing.Point(12, 54)
-        Me.DgvVep.Name = "DgvVep"
-        Me.DgvVep.Size = New System.Drawing.Size(552, 268)
-        Me.DgvVep.TabIndex = 5
         '
         'BtnSeleccionar
         '
@@ -202,11 +192,23 @@ Partial Class FrmSaldosMaria
         Me.BtnBusca.Text = "Busca"
         Me.BtnBusca.UseVisualStyleBackColor = True
         '
+        'Dgvdat
+        '
+        Me.Dgvdat.AllowUserToAddRows = False
+        Me.Dgvdat.AllowUserToDeleteRows = False
+        Me.Dgvdat.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.Dgvdat.Location = New System.Drawing.Point(12, 54)
+        Me.Dgvdat.Name = "Dgvdat"
+        Me.Dgvdat.ReadOnly = True
+        Me.Dgvdat.Size = New System.Drawing.Size(552, 268)
+        Me.Dgvdat.TabIndex = 21
+        '
         'FrmSaldosMaria
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1075, 660)
+        Me.Controls.Add(Me.Dgvdat)
         Me.Controls.Add(Me.BtnBusca)
         Me.Controls.Add(Me.MTxHasta)
         Me.Controls.Add(Me.MTxdesde)
@@ -216,7 +218,6 @@ Partial Class FrmSaldosMaria
         Me.Controls.Add(Me.BtnActualizar)
         Me.Controls.Add(Me.txtPath)
         Me.Controls.Add(Me.BtnSeleccionar)
-        Me.Controls.Add(Me.DgvVep)
         Me.Controls.Add(Me.BtnInforme)
         Me.Controls.Add(Me.BtnDeposito)
         Me.Controls.Add(Me.TxtTotalMaria)
@@ -226,8 +227,8 @@ Partial Class FrmSaldosMaria
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "SALDOS MARIA"
         CType(Me.DgvSaldos, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.DgvVep, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Dgvdat, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -236,7 +237,6 @@ Partial Class FrmSaldosMaria
     Friend WithEvents TxtTotalMaria As System.Windows.Forms.TextBox
     Friend WithEvents BtnDeposito As System.Windows.Forms.Button
     Friend WithEvents BtnInforme As System.Windows.Forms.Button
-    Friend WithEvents DgvVep As System.Windows.Forms.DataGridView
     Friend WithEvents BtnSeleccionar As System.Windows.Forms.Button
     Friend WithEvents txtPath As System.Windows.Forms.TextBox
     Friend WithEvents Fecha As System.Windows.Forms.DataGridViewTextBoxColumn
@@ -251,4 +251,5 @@ Partial Class FrmSaldosMaria
     Friend WithEvents MTxdesde As MaskedTextBox
     Friend WithEvents MTxHasta As MaskedTextBox
     Friend WithEvents BtnBusca As Button
+    Friend WithEvents Dgvdat As DataGridView
 End Class
