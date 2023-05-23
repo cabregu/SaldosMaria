@@ -30,20 +30,15 @@ Partial Class FrmSaldosMaria
         Me.Id = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.TxtTotalMaria = New System.Windows.Forms.TextBox()
         Me.BtnDeposito = New System.Windows.Forms.Button()
-        Me.BtnInforme = New System.Windows.Forms.Button()
-        Me.BtnSeleccionar = New System.Windows.Forms.Button()
-        Me.txtPath = New System.Windows.Forms.TextBox()
-        Me.BtnActualizar = New System.Windows.Forms.Button()
-        Me.Button1 = New System.Windows.Forms.Button()
-        Me.Button2 = New System.Windows.Forms.Button()
         Me.DataGridView1 = New System.Windows.Forms.DataGridView()
-        Me.MTxdesde = New System.Windows.Forms.MaskedTextBox()
-        Me.MTxHasta = New System.Windows.Forms.MaskedTextBox()
-        Me.BtnBusca = New System.Windows.Forms.Button()
-        Me.Dgvdat = New System.Windows.Forms.DataGridView()
+        Me.Button3 = New System.Windows.Forms.Button()
+        Me.DataGridView2 = New System.Windows.Forms.DataGridView()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.Label3 = New System.Windows.Forms.Label()
         CType(Me.DgvSaldos, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Dgvdat, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'DgvSaldos
@@ -105,120 +100,69 @@ Partial Class FrmSaldosMaria
         Me.BtnDeposito.Text = "Agregar Deposito"
         Me.BtnDeposito.UseVisualStyleBackColor = True
         '
-        'BtnInforme
-        '
-        Me.BtnInforme.Location = New System.Drawing.Point(12, 328)
-        Me.BtnInforme.Name = "BtnInforme"
-        Me.BtnInforme.Size = New System.Drawing.Size(75, 23)
-        Me.BtnInforme.TabIndex = 4
-        Me.BtnInforme.Text = "Informe"
-        Me.BtnInforme.UseVisualStyleBackColor = True
-        '
-        'BtnSeleccionar
-        '
-        Me.BtnSeleccionar.Location = New System.Drawing.Point(327, 15)
-        Me.BtnSeleccionar.Name = "BtnSeleccionar"
-        Me.BtnSeleccionar.Size = New System.Drawing.Size(36, 20)
-        Me.BtnSeleccionar.TabIndex = 7
-        Me.BtnSeleccionar.Text = "..."
-        Me.BtnSeleccionar.UseVisualStyleBackColor = True
-        '
-        'txtPath
-        '
-        Me.txtPath.Location = New System.Drawing.Point(12, 14)
-        Me.txtPath.Name = "txtPath"
-        Me.txtPath.Size = New System.Drawing.Size(309, 20)
-        Me.txtPath.TabIndex = 8
-        '
-        'BtnActualizar
-        '
-        Me.BtnActualizar.Location = New System.Drawing.Point(489, 328)
-        Me.BtnActualizar.Name = "BtnActualizar"
-        Me.BtnActualizar.Size = New System.Drawing.Size(75, 23)
-        Me.BtnActualizar.TabIndex = 14
-        Me.BtnActualizar.Text = "Actualizar"
-        Me.BtnActualizar.UseVisualStyleBackColor = True
-        '
-        'Button1
-        '
-        Me.Button1.Location = New System.Drawing.Point(444, 15)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(120, 23)
-        Me.Button1.TabIndex = 15
-        Me.Button1.Text = "Cargar desde Planilla"
-        Me.Button1.UseVisualStyleBackColor = True
-        '
-        'Button2
-        '
-        Me.Button2.Location = New System.Drawing.Point(593, 11)
-        Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(75, 23)
-        Me.Button2.TabIndex = 16
-        Me.Button2.Text = "Imagen"
-        Me.Button2.UseVisualStyleBackColor = True
-        '
         'DataGridView1
         '
         Me.DataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridView1.Location = New System.Drawing.Point(12, 412)
+        Me.DataGridView1.Location = New System.Drawing.Point(2, 54)
         Me.DataGridView1.Name = "DataGridView1"
-        Me.DataGridView1.Size = New System.Drawing.Size(552, 220)
+        Me.DataGridView1.Size = New System.Drawing.Size(585, 268)
         Me.DataGridView1.TabIndex = 17
         '
-        'MTxdesde
+        'Button3
         '
-        Me.MTxdesde.Location = New System.Drawing.Point(12, 386)
-        Me.MTxdesde.Mask = "00/00/0000"
-        Me.MTxdesde.Name = "MTxdesde"
-        Me.MTxdesde.Size = New System.Drawing.Size(100, 20)
-        Me.MTxdesde.TabIndex = 18
-        Me.MTxdesde.ValidatingType = GetType(Date)
+        Me.Button3.Location = New System.Drawing.Point(512, 618)
+        Me.Button3.Name = "Button3"
+        Me.Button3.Size = New System.Drawing.Size(75, 23)
+        Me.Button3.TabIndex = 22
+        Me.Button3.Text = "XLS"
+        Me.Button3.UseVisualStyleBackColor = True
         '
-        'MTxHasta
+        'DataGridView2
         '
-        Me.MTxHasta.Location = New System.Drawing.Point(118, 386)
-        Me.MTxHasta.Mask = "00/00/0000"
-        Me.MTxHasta.Name = "MTxHasta"
-        Me.MTxHasta.Size = New System.Drawing.Size(100, 20)
-        Me.MTxHasta.TabIndex = 19
-        Me.MTxHasta.ValidatingType = GetType(Date)
+        Me.DataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.DataGridView2.Location = New System.Drawing.Point(2, 353)
+        Me.DataGridView2.Name = "DataGridView2"
+        Me.DataGridView2.Size = New System.Drawing.Size(585, 259)
+        Me.DataGridView2.TabIndex = 23
         '
-        'BtnBusca
+        'Label1
         '
-        Me.BtnBusca.Location = New System.Drawing.Point(224, 384)
-        Me.BtnBusca.Name = "BtnBusca"
-        Me.BtnBusca.Size = New System.Drawing.Size(75, 23)
-        Me.BtnBusca.TabIndex = 20
-        Me.BtnBusca.Text = "Busca"
-        Me.BtnBusca.UseVisualStyleBackColor = True
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(2, 337)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(95, 13)
+        Me.Label1.TabIndex = 24
+        Me.Label1.Text = "Planilla embarques"
         '
-        'Dgvdat
+        'Label2
         '
-        Me.Dgvdat.AllowUserToAddRows = False
-        Me.Dgvdat.AllowUserToDeleteRows = False
-        Me.Dgvdat.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.Dgvdat.Location = New System.Drawing.Point(12, 54)
-        Me.Dgvdat.Name = "Dgvdat"
-        Me.Dgvdat.ReadOnly = True
-        Me.Dgvdat.Size = New System.Drawing.Size(552, 268)
-        Me.Dgvdat.TabIndex = 21
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(2, 35)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(65, 13)
+        Me.Label2.TabIndex = 25
+        Me.Label2.Text = "planilla veps"
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(998, 38)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(39, 13)
+        Me.Label3.TabIndex = 26
+        Me.Label3.Text = "Saldos"
         '
         'FrmSaldosMaria
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1075, 660)
-        Me.Controls.Add(Me.Dgvdat)
-        Me.Controls.Add(Me.BtnBusca)
-        Me.Controls.Add(Me.MTxHasta)
-        Me.Controls.Add(Me.MTxdesde)
+        Me.ClientSize = New System.Drawing.Size(1075, 693)
+        Me.Controls.Add(Me.Label3)
+        Me.Controls.Add(Me.Label2)
+        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.DataGridView2)
+        Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.DataGridView1)
-        Me.Controls.Add(Me.Button2)
-        Me.Controls.Add(Me.Button1)
-        Me.Controls.Add(Me.BtnActualizar)
-        Me.Controls.Add(Me.txtPath)
-        Me.Controls.Add(Me.BtnSeleccionar)
-        Me.Controls.Add(Me.BtnInforme)
         Me.Controls.Add(Me.BtnDeposito)
         Me.Controls.Add(Me.TxtTotalMaria)
         Me.Controls.Add(Me.DgvSaldos)
@@ -228,7 +172,7 @@ Partial Class FrmSaldosMaria
         Me.Text = "SALDOS MARIA"
         CType(Me.DgvSaldos, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Dgvdat, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -236,20 +180,15 @@ Partial Class FrmSaldosMaria
     Friend WithEvents DgvSaldos As System.Windows.Forms.DataGridView
     Friend WithEvents TxtTotalMaria As System.Windows.Forms.TextBox
     Friend WithEvents BtnDeposito As System.Windows.Forms.Button
-    Friend WithEvents BtnInforme As System.Windows.Forms.Button
-    Friend WithEvents BtnSeleccionar As System.Windows.Forms.Button
-    Friend WithEvents txtPath As System.Windows.Forms.TextBox
     Friend WithEvents Fecha As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents Nrodeposito As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents Importe As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents Saldo As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents Id As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents BtnActualizar As System.Windows.Forms.Button
-    Friend WithEvents Button1 As System.Windows.Forms.Button
-    Friend WithEvents Button2 As Button
     Friend WithEvents DataGridView1 As DataGridView
-    Friend WithEvents MTxdesde As MaskedTextBox
-    Friend WithEvents MTxHasta As MaskedTextBox
-    Friend WithEvents BtnBusca As Button
-    Friend WithEvents Dgvdat As DataGridView
+    Friend WithEvents Button3 As Button
+    Friend WithEvents DataGridView2 As DataGridView
+    Friend WithEvents Label1 As Label
+    Friend WithEvents Label2 As Label
+    Friend WithEvents Label3 As Label
 End Class
