@@ -15,7 +15,7 @@ Public Class FrmSaldosMaria
     End Sub
 
     Private Sub SaldosMaria_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        CrearCopia()
+
         CARGARDEPOSITOS()
         LeerDoscPoUbicacionArchivoVeps()
         LeerDoscPoUbicacionArchivoEmbarques()
@@ -258,30 +258,30 @@ Public Class FrmSaldosMaria
 
 
     End Sub
-    Private Sub CrearCopia()
+    'Private Sub CrearCopia()
 
-        Dim originalPath As String = "C:\SaldosMaria\SaldosMaria.db"
-        Dim backupFolderPath As String = "C:\SaldosMaria\Backup"
+    '    Dim originalPath As String = "C:\SaldosMaria\SaldosMaria.db"
+    '    Dim backupFolderPath As String = "C:\SaldosMaria\Backup"
 
-        If File.Exists(originalPath) Then
-            Dim fecha As Date = Now
-            Dim fechaTx As String = fecha.ToString("dd-MM-yyyy")
-            Dim backupPath As String = Path.Combine(backupFolderPath, $"SaldosMaria_{fechaTx}.db")
+    '    If File.Exists(originalPath) Then
+    '        Dim fecha As Date = Now
+    '        Dim fechaTx As String = fecha.ToString("dd-MM-yyyy")
+    '        Dim backupPath As String = Path.Combine(backupFolderPath, $"SaldosMaria_{fechaTx}.db")
 
-            If Not File.Exists(backupPath) Then
-                Try
-                    File.Copy(originalPath, backupPath)
-                    MsgBox("Copia de seguridad creada correctamente.", MsgBoxStyle.Information)
-                Catch ex As Exception
-                    MsgBox("Error al crear la copia de seguridad: " & ex.Message, MsgBoxStyle.Exclamation)
-                End Try
-            Else
-                'MsgBox("Ya existe una copia de seguridad para la fecha actual.", MsgBoxStyle.Information)
-            End If
-        Else
-            MsgBox("No se encontró el archivo de base de datos original.", MsgBoxStyle.Exclamation)
-        End If
-    End Sub
+    '        If Not File.Exists(backupPath) Then
+    '            Try
+    '                File.Copy(originalPath, backupPath)
+    '                MsgBox("Copia de seguridad creada correctamente.", MsgBoxStyle.Information)
+    '            Catch ex As Exception
+    '                MsgBox("Error al crear la copia de seguridad: " & ex.Message, MsgBoxStyle.Exclamation)
+    '            End Try
+    '        Else
+    '            'MsgBox("Ya existe una copia de seguridad para la fecha actual.", MsgBoxStyle.Information)
+    '        End If
+    '    Else
+    '        MsgBox("No se encontró el archivo de base de datos original.", MsgBoxStyle.Exclamation)
+    '    End If
+    'End Sub
 
 
 End Class
