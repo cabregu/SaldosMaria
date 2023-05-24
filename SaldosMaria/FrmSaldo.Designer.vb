@@ -36,9 +36,12 @@ Partial Class FrmSaldosMaria
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
+        Me.DataGridView3 = New System.Windows.Forms.DataGridView()
+        Me.Label4 = New System.Windows.Forms.Label()
         CType(Me.DgvSaldos, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.DataGridView3, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'DgvSaldos
@@ -110,7 +113,7 @@ Partial Class FrmSaldosMaria
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(512, 618)
+        Me.Button3.Location = New System.Drawing.Point(988, 658)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(75, 23)
         Me.Button3.TabIndex = 22
@@ -120,15 +123,15 @@ Partial Class FrmSaldosMaria
         'DataGridView2
         '
         Me.DataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridView2.Location = New System.Drawing.Point(2, 353)
+        Me.DataGridView2.Location = New System.Drawing.Point(593, 393)
         Me.DataGridView2.Name = "DataGridView2"
-        Me.DataGridView2.Size = New System.Drawing.Size(585, 259)
+        Me.DataGridView2.Size = New System.Drawing.Size(470, 259)
         Me.DataGridView2.TabIndex = 23
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(2, 337)
+        Me.Label1.Location = New System.Drawing.Point(593, 377)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(95, 13)
         Me.Label1.TabIndex = 24
@@ -152,11 +155,30 @@ Partial Class FrmSaldosMaria
         Me.Label3.TabIndex = 26
         Me.Label3.Text = "Saldos"
         '
+        'DataGridView3
+        '
+        Me.DataGridView3.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.DataGridView3.Location = New System.Drawing.Point(2, 393)
+        Me.DataGridView3.Name = "DataGridView3"
+        Me.DataGridView3.Size = New System.Drawing.Size(585, 259)
+        Me.DataGridView3.TabIndex = 27
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(2, 377)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(95, 13)
+        Me.Label4.TabIndex = 28
+        Me.Label4.Text = "Planilla embarques"
+        '
         'FrmSaldosMaria
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1075, 693)
+        Me.ClientSize = New System.Drawing.Size(1360, 779)
+        Me.Controls.Add(Me.Label4)
+        Me.Controls.Add(Me.DataGridView3)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label1)
@@ -173,6 +195,7 @@ Partial Class FrmSaldosMaria
         CType(Me.DgvSaldos, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.DataGridView3, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -191,4 +214,6 @@ Partial Class FrmSaldosMaria
     Friend WithEvents Label1 As Label
     Friend WithEvents Label2 As Label
     Friend WithEvents Label3 As Label
+    Friend WithEvents DataGridView3 As DataGridView
+    Friend WithEvents Label4 As Label
 End Class
