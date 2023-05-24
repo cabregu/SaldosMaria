@@ -30,18 +30,16 @@ Partial Class FrmSaldosMaria
         Me.Id = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.TxtTotalMaria = New System.Windows.Forms.TextBox()
         Me.BtnDeposito = New System.Windows.Forms.Button()
-        Me.DataGridView1 = New System.Windows.Forms.DataGridView()
+        Me.DgvVeps = New System.Windows.Forms.DataGridView()
         Me.Button3 = New System.Windows.Forms.Button()
-        Me.DataGridView2 = New System.Windows.Forms.DataGridView()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.DgvPlanillaxlsEmb = New System.Windows.Forms.DataGridView()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
-        Me.DataGridView3 = New System.Windows.Forms.DataGridView()
-        Me.Label4 = New System.Windows.Forms.Label()
+        Me.DgvEmbGoogle = New System.Windows.Forms.DataGridView()
         CType(Me.DgvSaldos, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.DataGridView3, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.DgvVeps, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.DgvPlanillaxlsEmb, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.DgvEmbGoogle, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'DgvSaldos
@@ -103,13 +101,13 @@ Partial Class FrmSaldosMaria
         Me.BtnDeposito.Text = "Agregar Deposito"
         Me.BtnDeposito.UseVisualStyleBackColor = True
         '
-        'DataGridView1
+        'DgvVeps
         '
-        Me.DataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridView1.Location = New System.Drawing.Point(2, 54)
-        Me.DataGridView1.Name = "DataGridView1"
-        Me.DataGridView1.Size = New System.Drawing.Size(585, 268)
-        Me.DataGridView1.TabIndex = 17
+        Me.DgvVeps.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.DgvVeps.Location = New System.Drawing.Point(2, 54)
+        Me.DgvVeps.Name = "DgvVeps"
+        Me.DgvVeps.Size = New System.Drawing.Size(585, 268)
+        Me.DgvVeps.TabIndex = 17
         '
         'Button3
         '
@@ -120,31 +118,22 @@ Partial Class FrmSaldosMaria
         Me.Button3.Text = "XLS"
         Me.Button3.UseVisualStyleBackColor = True
         '
-        'DataGridView2
+        'DgvPlanillaxlsEmb
         '
-        Me.DataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridView2.Location = New System.Drawing.Point(593, 393)
-        Me.DataGridView2.Name = "DataGridView2"
-        Me.DataGridView2.Size = New System.Drawing.Size(470, 259)
-        Me.DataGridView2.TabIndex = 23
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(593, 377)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(95, 13)
-        Me.Label1.TabIndex = 24
-        Me.Label1.Text = "Planilla embarques"
+        Me.DgvPlanillaxlsEmb.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.DgvPlanillaxlsEmb.Location = New System.Drawing.Point(270, 436)
+        Me.DgvPlanillaxlsEmb.Name = "DgvPlanillaxlsEmb"
+        Me.DgvPlanillaxlsEmb.Size = New System.Drawing.Size(265, 259)
+        Me.DgvPlanillaxlsEmb.TabIndex = 23
         '
         'Label2
         '
         Me.Label2.AutoSize = True
         Me.Label2.Location = New System.Drawing.Point(2, 35)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(65, 13)
+        Me.Label2.Size = New System.Drawing.Size(100, 13)
         Me.Label2.TabIndex = 25
-        Me.Label2.Text = "planilla veps"
+        Me.Label2.Text = "planilla veps google"
         '
         'Label3
         '
@@ -155,36 +144,25 @@ Partial Class FrmSaldosMaria
         Me.Label3.TabIndex = 26
         Me.Label3.Text = "Saldos"
         '
-        'DataGridView3
+        'DgvEmbGoogle
         '
-        Me.DataGridView3.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridView3.Location = New System.Drawing.Point(2, 393)
-        Me.DataGridView3.Name = "DataGridView3"
-        Me.DataGridView3.Size = New System.Drawing.Size(585, 259)
-        Me.DataGridView3.TabIndex = 27
-        '
-        'Label4
-        '
-        Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(2, 377)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(95, 13)
-        Me.Label4.TabIndex = 28
-        Me.Label4.Text = "Planilla embarques"
+        Me.DgvEmbGoogle.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.DgvEmbGoogle.Location = New System.Drawing.Point(12, 436)
+        Me.DgvEmbGoogle.Name = "DgvEmbGoogle"
+        Me.DgvEmbGoogle.Size = New System.Drawing.Size(252, 259)
+        Me.DgvEmbGoogle.TabIndex = 27
         '
         'FrmSaldosMaria
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1360, 779)
-        Me.Controls.Add(Me.Label4)
-        Me.Controls.Add(Me.DataGridView3)
+        Me.ClientSize = New System.Drawing.Size(1360, 749)
+        Me.Controls.Add(Me.DgvEmbGoogle)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.Label1)
-        Me.Controls.Add(Me.DataGridView2)
+        Me.Controls.Add(Me.DgvPlanillaxlsEmb)
         Me.Controls.Add(Me.Button3)
-        Me.Controls.Add(Me.DataGridView1)
+        Me.Controls.Add(Me.DgvVeps)
         Me.Controls.Add(Me.BtnDeposito)
         Me.Controls.Add(Me.TxtTotalMaria)
         Me.Controls.Add(Me.DgvSaldos)
@@ -193,9 +171,9 @@ Partial Class FrmSaldosMaria
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "SALDOS MARIA"
         CType(Me.DgvSaldos, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.DataGridView3, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.DgvVeps, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.DgvPlanillaxlsEmb, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.DgvEmbGoogle, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -208,12 +186,10 @@ Partial Class FrmSaldosMaria
     Friend WithEvents Importe As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents Saldo As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents Id As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents DataGridView1 As DataGridView
+    Friend WithEvents DgvVeps As DataGridView
     Friend WithEvents Button3 As Button
-    Friend WithEvents DataGridView2 As DataGridView
-    Friend WithEvents Label1 As Label
+    Friend WithEvents DgvPlanillaxlsEmb As DataGridView
     Friend WithEvents Label2 As Label
     Friend WithEvents Label3 As Label
-    Friend WithEvents DataGridView3 As DataGridView
-    Friend WithEvents Label4 As Label
+    Friend WithEvents DgvEmbGoogle As DataGridView
 End Class

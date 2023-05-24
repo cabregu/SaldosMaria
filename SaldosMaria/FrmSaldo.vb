@@ -1,4 +1,5 @@
-﻿Imports System.Data.SQLite
+﻿Imports System.Data.OleDb
+Imports System.Data.SQLite
 Imports System.Globalization
 Imports System.IO
 Imports System.Threading
@@ -19,13 +20,11 @@ Public Class FrmSaldosMaria
 
         CARGARDEPOSITOS()
         LeerDoscPoUbicacionArchivoVeps()
-        LeerDoscPoUbicacionArchivoEmbarquesPlanillaCristian()
         LeerDoscPoUbicacionArchivoEmbarques()
-
+        CargarArchivoExcel()
+        Obtenerdatosparagrid()
 
     End Sub
-
-
 
 
 
@@ -66,6 +65,7 @@ Public Class FrmSaldosMaria
         End Try
         Return Nothing
     End Function
+
     Private Sub LeerDoscPoUbicacionArchivoVeps()
 
         Dim DataTable As New DataTable
@@ -182,88 +182,42 @@ Public Class FrmSaldosMaria
             Next i
 
 
-            DataGridView1.DataSource = DataTable
+            ' Filtrar los registros del DataTable a partir del índice
+            Dim filteredDataTable As DataTable = DataTable.Clone()
+            For rowIndex As Integer = 0 To DataTable.Rows.Count - 1
+                If DataTable.Rows(rowIndex)("EMBARQUE").ToString().StartsWith("CT-10919") Then
+                    For i As Integer = rowIndex To DataTable.Rows.Count - 1
+                        Dim rowValues As Object() = DataTable.Rows(i).ItemArray
+                        filteredDataTable.Rows.Add(rowValues)
+                    Next
+                    Exit For
+                End If
+            Next
+
+            For Each row As DataRow In filteredDataTable.Rows
+                Dim fechaString As String = row("FECHA").ToString()
+                fechaString = fechaString.Replace("ene", "jan")
+                fechaString = fechaString.Replace("abr", "apr")
+
+                Dim fecha As DateTime
+                If DateTime.TryParse(fechaString, CultureInfo.GetCultureInfo("en-US"), DateTimeStyles.None, fecha) Then
+                    row("FECHA") = fecha.ToString("yyyy-MM-dd")
+                End If
+            Next
+
+
+
+
+            InsertarRegistrosEnSQLite(filteredDataTable)
+
+            DgvVeps.DataSource = filteredDataTable
+
         Else
 
             ' No hay suficientes hojas de cálculo en el archivo
             MessageBox.Show("El archivo no contiene al menos tres hojas de cálculo.")
         End If
     End Sub
-    Private Sub LeerDoscPoUbicacionArchivoEmbarquesPlanillaCristian()
-
-        ' Autenticarse con las credenciales descargadas
-        Dim credential As UserCredential
-        Using stream As New FileStream("C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\credencial.json", FileMode.Open, FileAccess.Read)
-            credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-            GoogleClientSecrets.Load(stream).Secrets,
-            {"https://www.googleapis.com/auth/spreadsheets.readonly"},
-            "cabregu@alephargentina.com.ar",
-            CancellationToken.None
-        ).Result
-        End Using
-
-        ' Crear el servicio de Google Sheets
-        Dim service = New SheetsService(New BaseClientService.Initializer() With {
-        .HttpClientInitializer = credential,
-        .ApplicationName = "EmbarquesMaria"
-    })
-
-        ' ID de la hoja de cálculo y rango de la hoja a leer
-        Dim spreadsheetId = "18SnWT5YaalHTlKU-sGZopvRGXiLCYJUyD4IQX9i9Bm4"
-        Dim spreadsheet = service.Spreadsheets.Get(spreadsheetId).Execute()
-        Dim sheets = spreadsheet.Sheets
-        Dim sheetIndex = 0
-
-        Dim range = sheets(sheetIndex).Properties.Title & "!A1:J"
-        Dim request = service.Spreadsheets.Values.Get(spreadsheetId, range)
-        Dim response = request.Execute()
-        Dim values = response.Values
-
-        ' Crear DataTable y agregar columnas
-        Dim dataTable As New DataTable()
-
-        If values IsNot Nothing AndAlso values.Count > 0 Then
-            Dim headerRow = values(0)
-
-            For Each header In headerRow
-                dataTable.Columns.Add(header.ToString())
-            Next
-        End If
-
-        ' Obtener los últimos 200 registros
-        Dim startIndex As Integer = Math.Max(values.Count - 200, 1)
-
-        ' Recorrer las filas restantes y agregar los datos al DataTable
-        For rowIndex As Integer = startIndex To values.Count - 1
-            Dim rowValues = values(rowIndex)
-
-            ' Verificar si los campos "emb" y "nrodespacho" están vacíos
-            Dim embValue = If(rowValues.Count > 0, rowValues(0).ToString(), "")
-            Dim nrodespachoValue = If(rowValues.Count > 1, rowValues(1).ToString(), "")
-
-            If Not String.IsNullOrEmpty(embValue) OrElse Not String.IsNullOrEmpty(nrodespachoValue) Then
-                Dim dataRow = dataTable.NewRow()
-
-                For columnIndex As Integer = 0 To rowValues.Count - 1
-                    dataRow(columnIndex) = rowValues(columnIndex)
-                Next
-
-                dataTable.Rows.Add(dataRow)
-            End If
-        Next
-
-        ' Eliminar las columnas de los campos "DepLec", "Depositos", "PagosLe" y "saldos"
-        dataTable.Columns.Remove("DepLec")
-        dataTable.Columns.Remove("Depositos")
-        dataTable.Columns.Remove("PagosLe")
-        dataTable.Columns.Remove("saldo")
-
-        DataGridView2.DataSource = dataTable
-
-
-    End Sub
-
-
     Private Sub LeerDoscPoUbicacionArchivoEmbarques()
         Dim dataTable As New DataTable
 
@@ -353,8 +307,9 @@ Public Class FrmSaldosMaria
             Next
 
 
+            ImportarASQLiteEmbarquesgoogle(filteredDataTable)
 
-            DataGridView3.DataSource = filteredDataTable
+
         Else
             ' No hay suficientes hojas de cálculo en el archivo
             MessageBox.Show("El archivo no contiene al menos tres hojas de cálculo.")
@@ -362,85 +317,244 @@ Public Class FrmSaldosMaria
         End If
     End Sub
 
+    Public Sub CargarArchivoExcel()
+        Dim cadenaConexion As String = "Provider=Microsoft.Jet.Oledb.4.0;Data Source=\\aleph-server-pc\SERVER NUEVO\Pc52\MARIA CATALENT.xls;Extended Properties='Excel 8.0;HDR=YES;'"
+        Dim añoActual As Integer = DateTime.Now.Year
+        Dim consultaSQL As String = "SELECT emb, Fecha, pagos FROM [CT$] WHERE emb IS NOT NULL AND YEAR(Fecha) = " & añoActual
+        Using conexion As New OleDbConnection(cadenaConexion)
+            Try
+                conexion.Open()
+                Using adaptador As New OleDbDataAdapter(consultaSQL, conexion)
+                    Dim dt As New DataTable()
+                    adaptador.Fill(dt)
+
+                    ActualizarBaseDatos(dt)
 
 
-    'Private Sub LeerDoscPoUbicacionArchivoEmbarques()
-    '    Dim dataTable As New DataTable
-
-    '    ' Autenticarse con las credenciales descargadas
-    '    Dim credential As UserCredential
-    '    Using stream As New FileStream("C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\credencial.json", FileMode.Open, FileAccess.Read)
-    '        credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-    '        GoogleClientSecrets.Load(stream).Secrets,
-    '        {"https://www.googleapis.com/auth/spreadsheets.readonly"},
-    '        "cabregu@alephargentina.com.ar",
-    '        CancellationToken.None
-    '    ).Result
-    '    End Using
-
-    '    ' Crear el servicio de Google Sheets
-    '    Dim service = New SheetsService(New BaseClientService.Initializer() With {
-    '    .HttpClientInitializer = credential,
-    '    .ApplicationName = "SALDOS"
-    '})
-
-    '    ' ID de la hoja de cálculo y rango de la hoja a leer
-    '    Dim spreadsheetId = "1Ak1I4oGmhnsQ-62OHNjwjynmIM60oCpbb5x2nWAljrc"
-    '    Dim spreadsheet = service.Spreadsheets.Get(spreadsheetId).Execute()
-    '    Dim sheets = spreadsheet.Sheets
-
-    '    ' Verificar si hay al menos tres hojas de cálculo en el archivo
-    '    If sheets.Count >= 1 Then
-    '        Dim sheetIndex = 0
-    '        ' Construir el rango de la tercera hoja utilizando el índice
-    '        Dim range = sheets(sheetIndex).Properties.Title & "!B1:L"
-
-    '        ' Leer los valores de la hoja de cálculo
-    '        Dim request = service.Spreadsheets.Values.Get(spreadsheetId, range)
-    '        Dim response = request.Execute()
-    '        Dim values = response.Values
-
-    '        If values IsNot Nothing AndAlso values.Count > 0 Then
-    '            ' Obtener los nombres de la primera fila
-    '            Dim headers As List(Of String) = values(0).Select(Function(cell) cell.ToString()).ToList()
-
-    '            ' Agregar las columnas al DataTable
-    '            For Each header In headers
-    '                dataTable.Columns.Add(header)
-    '            Next
-
-    '            ' Agregar los datos al DataTable
-    '            For rowIndex As Integer = 1 To values.Count - 1
-    '                Dim rowValues As List(Of String) = values(rowIndex).Select(Function(cell) cell.ToString()).ToList()
-    '                dataTable.Rows.Add(rowValues.ToArray())
-    '            Next
-    '        End If
-
-
-    '        Dim i As Integer = dataTable.Rows.Count - 1
-    '        While i >= 0
-    '            For Each columna As DataColumn In dataTable.Columns
-    '                If dataTable.Rows(i)(columna.ColumnName).ToString().Contains("EMBARQUE") Or dataTable.Rows(i)(columna.ColumnName).ToString().Contains("PD-") Then
-    '                    dataTable.Rows.RemoveAt(i)
-    '                    Exit For
-    '                End If
-    '            Next
-    '            i -= 1
-    '        End While
+                End Using
+            Catch ex As Exception
+                ' Manejar cualquier excepción
+                MessageBox.Show("Error al cargar el archivo de Excel: " & ex.Message)
+            Finally
+                ' Cerrar la conexión
+                conexion.Close()
+            End Try
+        End Using
+    End Sub
 
 
 
 
+    '********  Insertar Veps  ********
 
-    '        DataGridView3.DataSource = dataTable
+    Private Sub InsertarRegistrosEnSQLite(dataTable As DataTable)
+        ' Ruta y nombre de la base de datos SQLite
+        Dim dbPath As String = "C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db"
+
+        ' Cadena de conexión a la base de datos SQLite
+        Dim connectionString As String = $"Data Source={dbPath};Version=3;"
+
+        ' Crear la conexión a la base de datos SQLite
+        Using connection As New SQLiteConnection(connectionString)
+            connection.Open()
+
+            ' Verificar y insertar los registros
+            For Each row As DataRow In dataTable.Rows
+                If Not ExisteRegistroSQLite(connection, row) Then
+                    InsertarRegistroSQLite(connection, row)
+                End If
+            Next
+        End Using
+    End Sub
+    Private Function ExisteRegistroSQLite(connection As SQLiteConnection, row As DataRow) As Boolean
+        ' Sentencia SQL para buscar un registro en SQLite
+        Dim selectQuery As String = "SELECT COUNT(*) FROM Veps WHERE FECHA = @fecha AND EMBARQUE = @embarque AND IMPORTE = @importe AND NVEP = @nvep AND USUARIO = @usuario;"
+
+        ' Crear el comando SQL con los parámetros
+        Using command As New SQLiteCommand(selectQuery, connection)
+            command.Parameters.AddWithValue("@fecha", row("FECHA").ToString())
+            command.Parameters.AddWithValue("@embarque", row("EMBARQUE").ToString())
+            command.Parameters.AddWithValue("@importe", row("IMPORTE").ToString().Replace(",", "."))
+            command.Parameters.AddWithValue("@nvep", row("N°VEP").ToString())
+            command.Parameters.AddWithValue("@usuario", row("USUARIO").ToString())
+
+            ' Ejecutar la consulta y obtener el resultado
+            Dim result As Integer = Convert.ToInt32(command.ExecuteScalar())
+
+            ' Si el resultado es mayor a 0, significa que el registro ya existe
+            Return result > 0
+        End Using
+    End Function
+    Private Sub InsertarRegistroSQLite(connection As SQLiteConnection, row As DataRow)
+        ' Sentencia SQL para insertar un registro en SQLite
+        Dim insertQuery As String = "INSERT INTO Veps (FECHA, EMBARQUE, IMPORTE, NVEP, USUARIO) VALUES (@fecha, @embarque, @importe, @nvep, @usuario);"
+
+        ' Crear el comando SQL con los parámetros
+        Using command As New SQLiteCommand(insertQuery, connection)
+            command.Parameters.AddWithValue("@fecha", row("FECHA").ToString())
+            command.Parameters.AddWithValue("@embarque", row("EMBARQUE").ToString())
+            command.Parameters.AddWithValue("@importe", row("IMPORTE").ToString().Replace(",", "."))
+            command.Parameters.AddWithValue("@nvep", row("N°VEP").ToString())
+            command.Parameters.AddWithValue("@usuario", row("USUARIO").ToString())
+
+            ' Ejecutar el comando SQL para insertar el registro
+            command.ExecuteNonQuery()
+        End Using
+    End Sub
+
+    '************      Insertar planilla Google   *************
 
 
-    '    Else
-    '        ' No hay suficientes hojas de cálculo en el archivo
-    '        MessageBox.Show("El archivo no contiene al menos tres hojas de cálculo.")
-    '    End If
-    'End Sub
+    Public Sub ImportarASQLiteEmbarquesgoogle(dataTable As DataTable)
+        ' Ruta de la base de datos SQLite
+        Dim rutaBaseDatos As String = "C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db"
 
+        ' Cadena de conexión a la base de datos SQLite
+        Dim connectionString As String = "Data Source=" & rutaBaseDatos & ";Version=3;"
+
+        ' Conexión a la base de datos SQLite
+        Using conn As New SQLiteConnection(connectionString)
+            conn.Open()
+
+            ' Insertar registros en la base de datos
+            For Each row As DataRow In dataTable.Rows
+                Dim emb As String = row("Embarque").ToString()
+                Dim despacho As String = row("N° De Despacho").ToString()
+
+                ' Verificar si el registro ya existe en la base de datos
+                Using cmd As New SQLiteCommand(conn)
+                    cmd.CommandText = "SELECT COUNT(*) FROM embarquesgoogle WHERE Embarque = @Embarque AND [N° De Despacho] = @Despacho"
+                    cmd.Parameters.AddWithValue("@Embarque", emb)
+                    cmd.Parameters.AddWithValue("@Despacho", despacho)
+                    Dim count As Integer = Convert.ToInt32(cmd.ExecuteScalar())
+
+                    If count = 0 Then
+                        ' Insertar el registro si no existe
+                        cmd.CommandText = "INSERT INTO embarquesgoogle (Embarque, [N° De Despacho]) VALUES (@Embarque, @Despacho)"
+                        cmd.ExecuteNonQuery()
+                    End If
+                End Using
+            Next
+
+            ' Cerrar la conexión
+            conn.Close()
+        End Using
+    End Sub
+    Public Sub ActualizarBaseDatos(ByVal dt As DataTable)
+        Dim cadenaConexion As String = "Data Source=C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db;Version=3;"
+        Dim añoActual As Integer = DateTime.Now.Year
+
+        Using conexion As New SQLiteConnection(cadenaConexion)
+            Try
+                conexion.Open()
+
+                For Each fila As DataRow In dt.Rows
+                    Dim emb As String = fila("emb").ToString()
+                    Dim fecha As DateTime = Convert.ToDateTime(fila("Fecha")).Date ' Obtener solo la fecha sin la parte de la hora
+                    Dim pagos As Decimal = Convert.ToDecimal(fila("pagos"))
+
+                    ' Verificar si el valor de "emb" ya existe en la base de datos
+                    Dim existe As Boolean = False
+                    Dim verificarSQL As String = "SELECT emb FROM mariacatalent WHERE emb = @emb"
+                    Using verificarCmd As New SQLiteCommand(verificarSQL, conexion)
+                        verificarCmd.Parameters.AddWithValue("@emb", emb)
+                        Dim resultado As Object = verificarCmd.ExecuteScalar()
+                        If resultado IsNot Nothing Then
+                            existe = True
+                        End If
+                    End Using
+
+                    If Not existe Then
+                        ' Insertar un nuevo registro
+                        Dim insertarSQL As String = "INSERT INTO mariacatalent (emb, Fecha, pagos) VALUES (@emb, @fecha, @pagos)"
+                        Using insertarCmd As New SQLiteCommand(insertarSQL, conexion)
+                            insertarCmd.Parameters.AddWithValue("@emb", emb)
+                            insertarCmd.Parameters.AddWithValue("@fecha", fecha.ToString("yyyy-MM-dd")) ' Formatear la fecha como "yyyy-MM-dd"
+                            insertarCmd.Parameters.AddWithValue("@pagos", Decimal.Round(pagos, 2))
+                            insertarCmd.ExecuteNonQuery()
+                        End Using
+                    End If
+                Next fila
+            Catch ex As Exception
+                ' Manejar cualquier excepción
+                MessageBox.Show("Error al actualizar la base de datos: " & ex.Message)
+            Finally
+                ' Cerrar la conexión
+                conexion.Close()
+            End Try
+        End Using
+    End Sub
+
+
+    Private Function Obtenerdatosparagrid()
+        Dim Embarquesgoogle As New DataTable
+        Dim DtMariacatalent As New DataTable
+
+        Embarquesgoogle = ObtenerDataTableEmbarquesgoogle()
+        DtMariacatalent = ObtenerDataTableMariacatalent()
+
+        DgvEmbGoogle.DataSource = Embarquesgoogle
+        DgvPlanillaxlsEmb.DataSource = DtMariacatalent
+
+
+    End Function
+    Public Function ObtenerDataTableEmbarquesgoogle() As DataTable
+        Dim dataTable As New DataTable()
+
+        ' Ruta de la base de datos SQLite
+        Dim rutaBaseDatos As String = "C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db"
+
+        ' Cadena de conexión a la base de datos SQLite
+        Dim connectionString As String = "Data Source=" & rutaBaseDatos & ";Version=3;"
+
+        ' Conexión a la base de datos SQLite
+        Using conn As New SQLiteConnection(connectionString)
+            conn.Open()
+
+            ' Consulta para obtener todos los registros de la tabla "embarquesgoogle"
+            Dim selectQuery As String = "SELECT * FROM embarquesgoogle"
+            Using cmd As New SQLiteCommand(selectQuery, conn)
+                ' Crear un adaptador de datos para ejecutar la consulta y llenar el DataTable
+                Using adapter As New SQLiteDataAdapter(cmd)
+                    adapter.Fill(dataTable)
+                End Using
+            End Using
+
+            ' Cerrar la conexión
+            conn.Close()
+        End Using
+
+        Return dataTable
+    End Function
+
+    Public Function ObtenerDataTableMariacatalent() As DataTable
+        Dim dataTable As New DataTable()
+
+        Dim cadenaConexion As String = "Data Source=C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db;Version=3;"
+
+        Using conexion As New SQLiteConnection(cadenaConexion)
+            Try
+                conexion.Open()
+
+                ' Consulta para obtener todos los registros de la tabla "mariacatalent"
+                Dim selectQuery As String = "SELECT * FROM mariacatalent"
+                Using cmd As New SQLiteCommand(selectQuery, conexion)
+                    ' Crear un adaptador de datos para ejecutar la consulta y llenar el DataTable
+                    Using adapter As New SQLiteDataAdapter(cmd)
+                        adapter.Fill(dataTable)
+                    End Using
+                End Using
+            Catch ex As Exception
+                ' Manejar cualquier excepción
+                MessageBox.Show("Error al obtener los datos de la base de datos: " & ex.Message)
+            Finally
+                ' Cerrar la conexión
+                conexion.Close()
+            End Try
+        End Using
+
+        Return dataTable
+    End Function
 
 
 End Class
