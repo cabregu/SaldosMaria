@@ -33,7 +33,6 @@ Partial Class FrmSaldosMaria
         Me.DgvVeps = New System.Windows.Forms.DataGridView()
         Me.Button3 = New System.Windows.Forms.Button()
         Me.DgvPlanillaxlsEmb = New System.Windows.Forms.DataGridView()
-        Me.Label2 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.DgvEmbGoogle = New System.Windows.Forms.DataGridView()
         CType(Me.DgvSaldos, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -104,9 +103,9 @@ Partial Class FrmSaldosMaria
         'DgvVeps
         '
         Me.DgvVeps.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DgvVeps.Location = New System.Drawing.Point(2, 54)
+        Me.DgvVeps.Location = New System.Drawing.Point(12, 162)
         Me.DgvVeps.Name = "DgvVeps"
-        Me.DgvVeps.Size = New System.Drawing.Size(585, 268)
+        Me.DgvVeps.Size = New System.Drawing.Size(252, 268)
         Me.DgvVeps.TabIndex = 17
         '
         'Button3
@@ -125,15 +124,6 @@ Partial Class FrmSaldosMaria
         Me.DgvPlanillaxlsEmb.Name = "DgvPlanillaxlsEmb"
         Me.DgvPlanillaxlsEmb.Size = New System.Drawing.Size(265, 259)
         Me.DgvPlanillaxlsEmb.TabIndex = 23
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(2, 35)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(100, 13)
-        Me.Label2.TabIndex = 25
-        Me.Label2.Text = "planilla veps google"
         '
         'Label3
         '
@@ -159,7 +149,6 @@ Partial Class FrmSaldosMaria
         Me.ClientSize = New System.Drawing.Size(1360, 749)
         Me.Controls.Add(Me.DgvEmbGoogle)
         Me.Controls.Add(Me.Label3)
-        Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.DgvPlanillaxlsEmb)
         Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.DgvVeps)
@@ -189,7 +178,6 @@ Partial Class FrmSaldosMaria
     Friend WithEvents DgvVeps As DataGridView
     Friend WithEvents Button3 As Button
     Friend WithEvents DgvPlanillaxlsEmb As DataGridView
-    Friend WithEvents Label2 As Label
     Friend WithEvents Label3 As Label
     Friend WithEvents DgvEmbGoogle As DataGridView
 End Class

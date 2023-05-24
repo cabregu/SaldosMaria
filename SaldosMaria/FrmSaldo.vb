@@ -526,7 +526,6 @@ Public Class FrmSaldosMaria
 
         Return dataTable
     End Function
-
     Public Function ObtenerDataTableMariacatalent() As DataTable
         Dim dataTable As New DataTable()
 
@@ -555,6 +554,30 @@ Public Class FrmSaldosMaria
 
         Return dataTable
     End Function
+
+
+    Public Shared Function Condiferencia()
+        Dim consultacondiferencia As String = "SELECT eg.embarque, (mc.pagos - SUM(v.importe)) AS diferencia " &
+                        "FROM embarquesgoogle eg " &
+                        "JOIN mariacatalent mc ON eg.embarque = mc.emb " &
+                        "JOIN veps v ON eg.embarque = v.embarque " &
+                        "GROUP BY eg.embarque, mc.pagos " &
+                        "HAVING (mc.pagos - SUM(v.importe)) <> 0;"
+
+        Dim consultasindiferencia As String = "SELECT eg.embarque, (mc.pagos - SUM(v.importe)) AS diferencia " &
+                        "FROM embarquesgoogle eg " &
+                        "JOIN mariacatalent mc ON eg.embarque = mc.emb " &
+                        "JOIN veps v ON eg.embarque = v.embarque " &
+                        "GROUP BY eg.embarque, mc.pagos " &
+                        "HAVING (mc.pagos - SUM(v.importe)) = 0;"
+
+
+        '****Embarque, diferencia son los campos 
+
+
+
+    End Function
+
 
 
 End Class
