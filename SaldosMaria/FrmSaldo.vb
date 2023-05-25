@@ -48,7 +48,7 @@ Public Class FrmSaldosMaria
                 Dim imported As Double = Convert.ToDouble(dr("IMPORTE"))
                 Dim saldod As Double = Convert.ToDouble(dr("SALDO"))
 
-                DgvSaldos.Rows.Add(Fech.ToShortDateString, dr("Nrodeposito").ToString, imported.ToString("N2"), saldod.ToString("N2"))
+                DgvSaldos.Rows.Add(Fech.ToShortDateString, dr("NVep").ToString, imported.ToString("N2"), saldod.ToString("N2"))
 
             Next
             cn.Close()
@@ -318,9 +318,20 @@ Public Class FrmSaldosMaria
     End Sub
 
     Public Sub CargarArchivoExcel()
-        Dim cadenaConexion As String = "Provider=Microsoft.Jet.Oledb.4.0;Data Source=\\aleph-server-pc\SERVER NUEVO\Pc52\MARIA CATALENT.xls;Extended Properties='Excel 8.0;HDR=YES;'"
+        Dim archivoExcel As String = "\\aleph-server-pc\SERVER NUEVO\Pc52\MARIA CATALENT.xls"
+        Dim cadenaConexion As String = "Provider=Microsoft.ACE.OleDb.12.0;Data Source=" & archivoExcel & ";Extended Properties='Excel 8.0;HDR=YES;'"
         Dim añoActual As Integer = DateTime.Now.Year
         Dim consultaSQL As String = "SELECT emb, Fecha, pagos FROM [CT$] WHERE emb IS NOT NULL AND YEAR(Fecha) = " & añoActual
+
+        If Not VerificarRutaArchivo(archivoExcel) Then
+            archivoExcel = SeleccionarArchivoExcel()
+            If archivoExcel Is Nothing Then
+                Return
+            End If
+        End If
+
+        cadenaConexion = "Provider=Microsoft.ACE.OleDb.12.0;Data Source=" & archivoExcel & ";Extended Properties='Excel 8.0;HDR=YES;'"
+
         Using conexion As New OleDbConnection(cadenaConexion)
             Try
                 conexion.Open()
@@ -329,8 +340,6 @@ Public Class FrmSaldosMaria
                     adaptador.Fill(dt)
 
                     ActualizarBaseDatos(dt)
-
-
                 End Using
             Catch ex As Exception
                 ' Manejar cualquier excepción
@@ -341,6 +350,22 @@ Public Class FrmSaldosMaria
             End Try
         End Using
     End Sub
+
+    Private Function VerificarRutaArchivo(ByVal rutaArchivo As String) As Boolean
+        Return File.Exists(rutaArchivo)
+    End Function
+
+    Private Function SeleccionarArchivoExcel() As String
+        Dim dialogoArchivo As New OpenFileDialog()
+        dialogoArchivo.Filter = "Archivos de Excel|*.xls;*.xlsx"
+        dialogoArchivo.Title = "Seleccionar archivo de Excel"
+
+        If dialogoArchivo.ShowDialog() = DialogResult.OK Then
+            Return dialogoArchivo.FileName
+        Else
+            Return Nothing
+        End If
+    End Function
 
 
 
