@@ -2,6 +2,7 @@
 Imports System.Data.SQLite
 Imports System.Globalization
 Imports System.IO
+
 Imports System.Threading
 Imports Google.Apis.Auth.OAuth2
 Imports Google.Apis.Services
@@ -18,6 +19,7 @@ Public Class FrmSaldosMaria
 
     Private Sub SaldosMaria_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
+        SetDefaultDateFormat()
         CARGARDEPOSITOS()
         LeerDoscPoUbicacionArchivoVeps()
         LeerDoscPoUbicacionArchivoEmbarques()
@@ -27,35 +29,26 @@ Public Class FrmSaldosMaria
     End Sub
 
 
-
-
     Public Function CARGARDEPOSITOS()
         If DgvSaldos.Rows.Count > 0 Then
             DgvSaldos.Rows.Clear()
         End If
         Try
-
-
-
             Dim cn As New SQLiteConnection("Data Source=C:\Users\Cristian\source\repos\SaldosMaria\SaldosMaria\SaldosMaria.db;Version=3;")
             Dim cm As New SQLiteCommand("SELECT * FROM BASE WHERE SALDO > 0.00", cn)
             Dim da As New SQLiteDataAdapter(cm)
             Dim ds As New DataSet()
             da.Fill(ds, "BASE")
 
-            For Each dr As DataRow In ds.Tables("BASE").Rows
-                Dim Fech As Date = Convert.ToDateTime(dr("FECHA"))
-                Dim imported As Double = Convert.ToDouble(dr("IMPORTE"))
-                Dim saldod As Double = Convert.ToDouble(dr("SALDO"))
+            Dim dataTable As DataTable = ds.Tables("BASE")
 
-                DgvSaldos.Rows.Add(Fech.ToShortDateString, dr("NVep").ToString, imported.ToString("N2"), saldod.ToString("N2"))
+            DgvSaldos.DataSource = dataTable
 
-            Next
             cn.Close()
 
             Dim imported2 As Decimal = 0.00
-            For Each dr As DataRow In ds.Tables("BASE").Rows
-                imported2 = imported2 + Convert.ToDecimal(dr("saldo"))
+            For Each row As DataRow In dataTable.Rows
+                imported2 = imported2 + Convert.ToDecimal(row("SALDO"))
             Next
 
             TxtTotalMaria.Text = imported2.ToString()
@@ -65,6 +58,7 @@ Public Class FrmSaldosMaria
         End Try
         Return Nothing
     End Function
+
 
     Private Sub LeerDoscPoUbicacionArchivoVeps()
 
@@ -210,7 +204,7 @@ Public Class FrmSaldosMaria
 
             InsertarRegistrosEnSQLite(filteredDataTable)
 
-            DgvVeps.DataSource = filteredDataTable
+
 
         Else
 
@@ -368,8 +362,6 @@ Public Class FrmSaldosMaria
     End Function
 
 
-
-
     '********  Insertar Veps  ********
 
     Private Sub InsertarRegistrosEnSQLite(dataTable As DataTable)
@@ -448,14 +440,14 @@ Public Class FrmSaldosMaria
 
                 ' Verificar si el registro ya existe en la base de datos
                 Using cmd As New SQLiteCommand(conn)
-                    cmd.CommandText = "SELECT COUNT(*) FROM embarquesgoogle WHERE Embarque = @Embarque AND [N° De Despacho] = @Despacho"
+                    cmd.CommandText = "SELECT COUNT(*) FROM embarquesgoogle WHERE Embarque = @Embarque AND NroDespacho = @Despacho"
                     cmd.Parameters.AddWithValue("@Embarque", emb)
                     cmd.Parameters.AddWithValue("@Despacho", despacho)
                     Dim count As Integer = Convert.ToInt32(cmd.ExecuteScalar())
 
                     If count = 0 Then
                         ' Insertar el registro si no existe
-                        cmd.CommandText = "INSERT INTO embarquesgoogle (Embarque, [N° De Despacho]) VALUES (@Embarque, @Despacho)"
+                        cmd.CommandText = "INSERT INTO embarquesgoogle (Embarque, NroDespacho) VALUES (@Embarque, @Despacho)"
                         cmd.ExecuteNonQuery()
                     End If
                 End Using
@@ -510,17 +502,13 @@ Public Class FrmSaldosMaria
         End Using
     End Sub
 
-
     Private Function Obtenerdatosparagrid()
-        Dim Embarquesgoogle As New DataTable
-        Dim DtMariacatalent As New DataTable
 
-        Embarquesgoogle = ObtenerDataTableEmbarquesgoogle()
-        DtMariacatalent = ObtenerDataTableMariacatalent()
 
-        DgvEmbGoogle.DataSource = Embarquesgoogle
-        DgvPlanillaxlsEmb.DataSource = DtMariacatalent
-
+        DgvEmbGoogle.DataSource = ObtenerDataTableEmbarquesgoogle()
+        DgvBase.DataSource = ObtenerBase()
+        dgvdespachos.DataSource = ObtenerDespachos()
+        DgvVeps.DataSource = ObtenerVeps()
 
     End Function
     Public Function ObtenerDataTableEmbarquesgoogle() As DataTable
@@ -536,8 +524,17 @@ Public Class FrmSaldosMaria
         Using conn As New SQLiteConnection(connectionString)
             conn.Open()
 
-            ' Consulta para obtener todos los registros de la tabla "embarquesgoogle"
-            Dim selectQuery As String = "SELECT * FROM embarquesgoogle"
+            Dim selectQuery As String = "SELECT embarquesgoogle.*,mariacatalent.fecha ,mariacatalent.pagos AS PagosTotal, veps.importe AS ImporteVeps, (mariacatalent.pagos - veps.importe) AS diferencia " &
+                                    "FROM (embarquesgoogle " &
+                                    "INNER JOIN mariacatalent ON embarquesgoogle.embarque = mariacatalent.emb) " &
+                                    "INNER JOIN veps ON embarquesgoogle.embarque = veps.embarque " &
+                                    "WHERE mariacatalent.fecha >= '2023-01-01' AND embarquesgoogle.NroDespacho NOT IN (SELECT Numerodespacho FROM DespachosOficializados) " &
+                                    "GROUP BY embarquesgoogle.embarque"
+
+
+
+
+
             Using cmd As New SQLiteCommand(selectQuery, conn)
                 ' Crear un adaptador de datos para ejecutar la consulta y llenar el DataTable
                 Using adapter As New SQLiteDataAdapter(cmd)
@@ -551,58 +548,156 @@ Public Class FrmSaldosMaria
 
         Return dataTable
     End Function
-    Public Function ObtenerDataTableMariacatalent() As DataTable
+
+    Public Function ObtenerBase() As DataTable
         Dim dataTable As New DataTable()
 
-        Dim cadenaConexion As String = "Data Source=C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db;Version=3;"
+        ' Ruta de la base de datos SQLite
+        Dim rutaBaseDatos As String = "C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db"
 
-        Using conexion As New SQLiteConnection(cadenaConexion)
-            Try
-                conexion.Open()
+        ' Cadena de conexión a la base de datos SQLite
+        Dim connectionString As String = "Data Source=" & rutaBaseDatos & ";Version=3;"
 
-                ' Consulta para obtener todos los registros de la tabla "mariacatalent"
-                Dim selectQuery As String = "SELECT * FROM mariacatalent"
-                Using cmd As New SQLiteCommand(selectQuery, conexion)
-                    ' Crear un adaptador de datos para ejecutar la consulta y llenar el DataTable
-                    Using adapter As New SQLiteDataAdapter(cmd)
-                        adapter.Fill(dataTable)
-                    End Using
+        ' Conexión a la base de datos SQLite
+        Using conn As New SQLiteConnection(connectionString)
+            conn.Open()
+
+            ' Consulta para obtener los registros de la tabla "base" con fechas posteriores a "2023-02-01"
+            ' y un campo adicional "diferencia", que es la resta del importe de "base" y la suma de importes de "veps" para el mismo "nvep"
+            ' También se obtiene la sumatoria de importes de "veps" para el mismo "nvep"
+            Dim selectQuery As String = "SELECT b.*, (b.importe - COALESCE(v.total_importes, 0)) AS diferencia, COALESCE(v.total_importes, 0) AS sumatoria " &
+                                    "FROM base AS b " &
+                                    "LEFT JOIN (SELECT nvep, SUM(importe) AS total_importes FROM veps GROUP BY nvep) AS v ON b.nvep = v.nvep " &
+                                    "WHERE b.fecha > '2023-01-01'"
+
+            Using cmd As New SQLiteCommand(selectQuery, conn)
+                ' Crear un adaptador de datos para ejecutar la consulta y llenar el DataTable
+                Using adapter As New SQLiteDataAdapter(cmd)
+                    adapter.Fill(dataTable)
                 End Using
-            Catch ex As Exception
-                ' Manejar cualquier excepción
-                MessageBox.Show("Error al obtener los datos de la base de datos: " & ex.Message)
-            Finally
-                ' Cerrar la conexión
-                conexion.Close()
-            End Try
+            End Using
+
+            ' Cerrar la conexión
+            conn.Close()
         End Using
 
         Return dataTable
     End Function
 
+    Public Function ObtenerDespachos() As DataTable
+        Dim dataTable As New DataTable()
 
-    Public Shared Function Condiferencia()
-        Dim consultacondiferencia As String = "SELECT eg.embarque, (mc.pagos - SUM(v.importe)) AS diferencia " &
-                        "FROM embarquesgoogle eg " &
-                        "JOIN mariacatalent mc ON eg.embarque = mc.emb " &
-                        "JOIN veps v ON eg.embarque = v.embarque " &
-                        "GROUP BY eg.embarque, mc.pagos " &
-                        "HAVING (mc.pagos - SUM(v.importe)) <> 0;"
+        ' Ruta de la base de datos SQLite
+        Dim rutaBaseDatos As String = "C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db"
 
-        Dim consultasindiferencia As String = "SELECT eg.embarque, (mc.pagos - SUM(v.importe)) AS diferencia " &
-                        "FROM embarquesgoogle eg " &
-                        "JOIN mariacatalent mc ON eg.embarque = mc.emb " &
-                        "JOIN veps v ON eg.embarque = v.embarque " &
-                        "GROUP BY eg.embarque, mc.pagos " &
-                        "HAVING (mc.pagos - SUM(v.importe)) = 0;"
+        ' Cadena de conexión a la base de datos SQLite
+        Dim connectionString As String = "Data Source=" & rutaBaseDatos & ";Version=3;"
 
+        ' Conexión a la base de datos SQLite
+        Using conn As New SQLiteConnection(connectionString)
+            conn.Open()
 
-        '****Embarque, diferencia son los campos 
+            ' Consulta para obtener los registros de la tabla "base" con un campo adicional "sumatoria" y "diferencia"
+            ' que involucra los datos de la tabla "DespachosOficializados", con filtro de fecha desde "2023-01-01"
+            Dim selectQuery As String = "SELECT base.*, " &
+                                        "SUM(DespachosOficializados.Descontado) AS sumatoria, " &
+                                        "(base.importe - SUM(DespachosOficializados.Descontado)) AS diferencia " &
+                                        "FROM base " &
+                                        "LEFT JOIN DespachosOficializados ON base.nvep = DespachosOficializados.DepositoUsado " &
+                                        "WHERE base.fecha >= '2023-01-01' " &
+                                        "GROUP BY base.nvep"
 
+            Using cmd As New SQLiteCommand(selectQuery, conn)
+                ' Crear un adaptador de datos para ejecutar la consulta y llenar el DataTable
+                Using adapter As New SQLiteDataAdapter(cmd)
+                    adapter.Fill(dataTable)
+                End Using
+            End Using
 
+            ' Cerrar la conexión
+            conn.Close()
+        End Using
 
+        Return dataTable
     End Function
 
+    Public Function ObtenerVeps() As DataTable
+        Dim dataTable As New DataTable()
+
+        ' Ruta de la base de datos SQLite
+        Dim rutaBaseDatos As String = "C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db"
+
+        ' Cadena de conexión a la base de datos SQLite
+        Dim connectionString As String = "Data Source=" & rutaBaseDatos & ";Version=3;"
+
+        ' Conexión a la base de datos SQLite
+        Using conn As New SQLiteConnection(connectionString)
+            conn.Open()
+
+            Dim selectQuery As String = "SELECT Veps.fecha, Veps.embarque, embarquesgoogle.NroDespacho, Veps.importe, Veps.nvep " &
+                                    "FROM Veps " &
+                                    "INNER JOIN embarquesgoogle ON Veps.embarque = embarquesgoogle.embarque " &
+                                    "WHERE embarquesgoogle.NroDespacho NOT IN (SELECT Numerodespacho FROM DespachosOficializados)"
+
+            Using cmd As New SQLiteCommand(selectQuery, conn)
+                ' Crear un adaptador de datos para ejecutar la consulta y llenar el DataTable
+                Using adapter As New SQLiteDataAdapter(cmd)
+                    adapter.Fill(dataTable)
+                End Using
+            End Using
+
+            ' Cerrar la conexión
+            conn.Close()
+        End Using
+
+        Return dataTable
+    End Function
+
+    Private Sub SetDefaultDateFormat()
+        Dim cultureInfo As New CultureInfo("en-US") ' Puedes ajustar el código de idioma según tus necesidades
+        cultureInfo.DateTimeFormat.ShortDatePattern = "yyyy-MM-dd"
+        cultureInfo.DateTimeFormat.DateSeparator = "-"
+
+        System.Threading.Thread.CurrentThread.CurrentCulture = cultureInfo
+        System.Threading.Thread.CurrentThread.CurrentUICulture = cultureInfo
+    End Sub
+
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+
+        For Each filago As DataGridViewRow In DgvEmbGoogle.Rows
+            If filago.Cells("diferencia").Value = "0" Then
+                Dim Embarquego As String = filago.Cells("Embarque").Value
+
+                For Each filavep As DataGridViewRow In DgvVeps.Rows
+                    If filavep.Cells("embarque").Value = Embarquego Then
+                        Dim NroVep As String = filavep.Cells("NVEP").Value
+                        Dim ImporteVep As Decimal = filavep.Cells("IMPORTE").Value
+
+
+
+                        For Each filabase As DataGridViewRow In DgvBase.Rows
+
+                            If filabase.Cells("NVEP").Value = NroVep Then
+                                Dim ImporteSaldo As Decimal = filabase.Cells("Saldo").Value
+
+                                MsgBox("SaldoMaria " & ImporteSaldo & "importevep " & ImporteVep)
+
+                                If ImporteSaldo <= ImporteVep Then
+                                    filavep.DefaultCellStyle.BackColor = Color.Yellow
+                                Else
+                                    filavep.DefaultCellStyle.BackColor = Color.Green
+                                End If
+                            End If
+
+                        Next
+                    End If
+                Next
+            End If
+        Next
+
+
+    End Sub
 
 
 End Class

@@ -23,22 +23,22 @@ Partial Class FrmSaldosMaria
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.DgvSaldos = New System.Windows.Forms.DataGridView()
-        Me.Fecha = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Nrodeposito = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Importe = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Saldo = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Id = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.TxtTotalMaria = New System.Windows.Forms.TextBox()
         Me.BtnDeposito = New System.Windows.Forms.Button()
         Me.DgvVeps = New System.Windows.Forms.DataGridView()
-        Me.Button3 = New System.Windows.Forms.Button()
-        Me.DgvPlanillaxlsEmb = New System.Windows.Forms.DataGridView()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.DgvEmbGoogle = New System.Windows.Forms.DataGridView()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.DgvBase = New System.Windows.Forms.DataGridView()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.dgvdespachos = New System.Windows.Forms.DataGridView()
+        Me.Button1 = New System.Windows.Forms.Button()
         CType(Me.DgvSaldos, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DgvVeps, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.DgvPlanillaxlsEmb, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DgvEmbGoogle, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.DgvBase, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dgvdespachos, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'DgvSaldos
@@ -46,54 +46,22 @@ Partial Class FrmSaldosMaria
         Me.DgvSaldos.AllowUserToAddRows = False
         Me.DgvSaldos.AllowUserToDeleteRows = False
         Me.DgvSaldos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DgvSaldos.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Fecha, Me.Nrodeposito, Me.Importe, Me.Saldo, Me.Id})
-        Me.DgvSaldos.Location = New System.Drawing.Point(593, 54)
+        Me.DgvSaldos.Location = New System.Drawing.Point(878, 22)
         Me.DgvSaldos.Name = "DgvSaldos"
         Me.DgvSaldos.ReadOnly = True
         Me.DgvSaldos.Size = New System.Drawing.Size(470, 268)
         Me.DgvSaldos.TabIndex = 0
         '
-        'Fecha
-        '
-        Me.Fecha.HeaderText = "Fecha"
-        Me.Fecha.Name = "Fecha"
-        Me.Fecha.ReadOnly = True
-        '
-        'Nrodeposito
-        '
-        Me.Nrodeposito.HeaderText = "NroDeposito"
-        Me.Nrodeposito.Name = "Nrodeposito"
-        Me.Nrodeposito.ReadOnly = True
-        '
-        'Importe
-        '
-        Me.Importe.HeaderText = "Importe"
-        Me.Importe.Name = "Importe"
-        Me.Importe.ReadOnly = True
-        '
-        'Saldo
-        '
-        Me.Saldo.HeaderText = "Saldo"
-        Me.Saldo.Name = "Saldo"
-        Me.Saldo.ReadOnly = True
-        '
-        'Id
-        '
-        Me.Id.HeaderText = "Id"
-        Me.Id.Name = "Id"
-        Me.Id.ReadOnly = True
-        Me.Id.Visible = False
-        '
         'TxtTotalMaria
         '
-        Me.TxtTotalMaria.Location = New System.Drawing.Point(963, 330)
+        Me.TxtTotalMaria.Location = New System.Drawing.Point(1248, 298)
         Me.TxtTotalMaria.Name = "TxtTotalMaria"
         Me.TxtTotalMaria.Size = New System.Drawing.Size(100, 20)
         Me.TxtTotalMaria.TabIndex = 2
         '
         'BtnDeposito
         '
-        Me.BtnDeposito.Location = New System.Drawing.Point(593, 328)
+        Me.BtnDeposito.Location = New System.Drawing.Point(878, 296)
         Me.BtnDeposito.Name = "BtnDeposito"
         Me.BtnDeposito.Size = New System.Drawing.Size(130, 23)
         Me.BtnDeposito.TabIndex = 3
@@ -103,32 +71,15 @@ Partial Class FrmSaldosMaria
         'DgvVeps
         '
         Me.DgvVeps.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DgvVeps.Location = New System.Drawing.Point(12, 162)
+        Me.DgvVeps.Location = New System.Drawing.Point(15, 22)
         Me.DgvVeps.Name = "DgvVeps"
-        Me.DgvVeps.Size = New System.Drawing.Size(252, 268)
+        Me.DgvVeps.Size = New System.Drawing.Size(654, 188)
         Me.DgvVeps.TabIndex = 17
-        '
-        'Button3
-        '
-        Me.Button3.Location = New System.Drawing.Point(988, 658)
-        Me.Button3.Name = "Button3"
-        Me.Button3.Size = New System.Drawing.Size(75, 23)
-        Me.Button3.TabIndex = 22
-        Me.Button3.Text = "XLS"
-        Me.Button3.UseVisualStyleBackColor = True
-        '
-        'DgvPlanillaxlsEmb
-        '
-        Me.DgvPlanillaxlsEmb.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DgvPlanillaxlsEmb.Location = New System.Drawing.Point(270, 436)
-        Me.DgvPlanillaxlsEmb.Name = "DgvPlanillaxlsEmb"
-        Me.DgvPlanillaxlsEmb.Size = New System.Drawing.Size(265, 259)
-        Me.DgvPlanillaxlsEmb.TabIndex = 23
         '
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(998, 38)
+        Me.Label3.Location = New System.Drawing.Point(1283, 6)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(39, 13)
         Me.Label3.TabIndex = 26
@@ -137,20 +88,76 @@ Partial Class FrmSaldosMaria
         'DgvEmbGoogle
         '
         Me.DgvEmbGoogle.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DgvEmbGoogle.Location = New System.Drawing.Point(12, 436)
+        Me.DgvEmbGoogle.Location = New System.Drawing.Point(12, 229)
         Me.DgvEmbGoogle.Name = "DgvEmbGoogle"
-        Me.DgvEmbGoogle.Size = New System.Drawing.Size(252, 259)
+        Me.DgvEmbGoogle.Size = New System.Drawing.Size(657, 188)
         Me.DgvEmbGoogle.TabIndex = 27
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(15, 6)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(31, 13)
+        Me.Label1.TabIndex = 28
+        Me.Label1.Text = "Veps"
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(9, 213)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(59, 13)
+        Me.Label2.TabIndex = 29
+        Me.Label2.Text = "embgoogle"
+        '
+        'DgvBase
+        '
+        Me.DgvBase.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.DgvBase.Location = New System.Drawing.Point(12, 436)
+        Me.DgvBase.Name = "DgvBase"
+        Me.DgvBase.Size = New System.Drawing.Size(657, 259)
+        Me.DgvBase.TabIndex = 30
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(12, 420)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(72, 13)
+        Me.Label4.TabIndex = 31
+        Me.Label4.Text = "TABLA BASE"
+        '
+        'dgvdespachos
+        '
+        Me.dgvdespachos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgvdespachos.Location = New System.Drawing.Point(691, 436)
+        Me.dgvdespachos.Name = "dgvdespachos"
+        Me.dgvdespachos.Size = New System.Drawing.Size(657, 259)
+        Me.dgvdespachos.TabIndex = 32
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(691, 174)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(75, 23)
+        Me.Button1.TabIndex = 33
+        Me.Button1.Text = "Button1"
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'FrmSaldosMaria
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1360, 749)
+        Me.ClientSize = New System.Drawing.Size(1372, 707)
+        Me.Controls.Add(Me.Button1)
+        Me.Controls.Add(Me.dgvdespachos)
+        Me.Controls.Add(Me.Label4)
+        Me.Controls.Add(Me.DgvBase)
+        Me.Controls.Add(Me.Label2)
+        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.DgvEmbGoogle)
         Me.Controls.Add(Me.Label3)
-        Me.Controls.Add(Me.DgvPlanillaxlsEmb)
-        Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.DgvVeps)
         Me.Controls.Add(Me.BtnDeposito)
         Me.Controls.Add(Me.TxtTotalMaria)
@@ -161,8 +168,9 @@ Partial Class FrmSaldosMaria
         Me.Text = "SALDOS MARIA"
         CType(Me.DgvSaldos, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DgvVeps, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.DgvPlanillaxlsEmb, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DgvEmbGoogle, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.DgvBase, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dgvdespachos, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -170,14 +178,13 @@ Partial Class FrmSaldosMaria
     Friend WithEvents DgvSaldos As System.Windows.Forms.DataGridView
     Friend WithEvents TxtTotalMaria As System.Windows.Forms.TextBox
     Friend WithEvents BtnDeposito As System.Windows.Forms.Button
-    Friend WithEvents Fecha As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents Nrodeposito As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents Importe As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents Saldo As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents Id As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents DgvVeps As DataGridView
-    Friend WithEvents Button3 As Button
-    Friend WithEvents DgvPlanillaxlsEmb As DataGridView
     Friend WithEvents Label3 As Label
     Friend WithEvents DgvEmbGoogle As DataGridView
+    Friend WithEvents Label1 As Label
+    Friend WithEvents Label2 As Label
+    Friend WithEvents DgvBase As DataGridView
+    Friend WithEvents Label4 As Label
+    Friend WithEvents dgvdespachos As DataGridView
+    Friend WithEvents Button1 As Button
 End Class
