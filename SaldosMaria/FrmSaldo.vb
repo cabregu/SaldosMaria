@@ -13,20 +13,23 @@ Public Class FrmSaldosMaria
 
     Private Sub BtnDeposito_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BtnDeposito.Click
         FrmAgregarDeposito.Show()
-
     End Sub
-
     Private Sub SaldosMaria_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
         SetDefaultDateFormat()
         CARGARDEPOSITOS()
-        LeerDoscPoUbicacionArchivoVeps()
+
+        'traer de planilla mochi los veps cargados sin guardar
+        LeerVepsDesdeGoogleymostrarendgv()
+
+        'traer de planilla mochi los embarques cargados desde el 10909 y guardarlos en sqlite
         LeerDoscPoUbicacionArchivoEmbarques()
-        CargarArchivoExcel()
-        Obtenerdatosparagrid()
+
+
+
+
 
     End Sub
-
 
     Public Function CARGARDEPOSITOS()
         If DgvSaldos.Rows.Count > 0 Then
@@ -58,12 +61,8 @@ Public Class FrmSaldosMaria
         Return Nothing
     End Function
 
-
-    Private Sub LeerDoscPoUbicacionArchivoVeps()
-
+    Private Function LeerVepsDesdeGoogleymostrarendgv()
         Dim DataTable As New DataTable
-
-
 
         ' Autenticarse con las credenciales descargadas
         Dim credential As UserCredential
@@ -103,41 +102,22 @@ Public Class FrmSaldosMaria
 
             DataTable.Columns.Add("FECHA", GetType(String))
             DataTable.Columns.Add("EMBARQUE", GetType(String))
-            DataTable.Columns.Add("IMPORTE", GetType(Double))
+            DataTable.Columns.Add("IMPORTE", GetType(String))
             DataTable.Columns.Add("N°VEP", GetType(String))
             DataTable.Columns.Add("USUARIO", GetType(String))
 
-            ' ...
 
-            ' Agregar filas al DataTable
             If values IsNot Nothing AndAlso values.Count > 0 Then
                 For Each row In values
-                    ' Crear una nueva fila en el DataTable
                     Dim newRow = DataTable.NewRow()
 
-                    ' Agregar los valores de la fila de la hoja de cálculo a la fila del DataTable
                     For i = 0 To row.Count - 1
-                        If i = 2 Then
-                            ' Eliminar el signo de pesos y los separadores de miles del valor de "IMPORTE"
-                            Dim importe As String = row(i).ToString()
-                            importe = importe.Replace("$", "").Replace(".", "")
-
-                            ' Validar el formato del valor de "IMPORTE"
-                            Dim importeValido As Double
-                            If Double.TryParse(importe, importeValido) Then
-                                newRow(i) = importeValido
-                            Else
-                                newRow(i) = 0 ' Opcionalmente, puedes asignar un valor predeterminado para los formatos incorrectos
-                                ' También puedes mostrar un mensaje de error o realizar alguna acción adicional
-                            End If
-                        Else
-                            newRow(i) = row(i).ToString()
-                        End If
+                        newRow(i) = row(i).ToString()
                     Next
 
-                    ' Agregar la fila al DataTable
                     DataTable.Rows.Add(newRow)
                 Next
+
             End If
 
             ' ...
@@ -200,9 +180,15 @@ Public Class FrmSaldosMaria
 
 
 
+            For Each row As DataRow In filteredDataTable.Rows
+                Dim importeString As String = row("IMPORTE").ToString()
+                importeString = importeString.Replace(".", "")
+                importeString = importeString.Replace("$", "")
+                row("IMPORTE") = importeString
+            Next
 
-            InsertarRegistrosEnSQLite(filteredDataTable)
 
+            DgvVeps.DataSource = filteredDataTable
 
 
         Else
@@ -210,8 +196,10 @@ Public Class FrmSaldosMaria
             ' No hay suficientes hojas de cálculo en el archivo
             MessageBox.Show("El archivo no contiene al menos tres hojas de cálculo.")
         End If
-    End Sub
-    Private Sub LeerDoscPoUbicacionArchivoEmbarques()
+    End Function
+
+
+    Private Function LeerDoscPoUbicacionArchivoEmbarques()
         Dim dataTable As New DataTable
 
         ' Autenticarse con las credenciales descargadas
@@ -300,7 +288,26 @@ Public Class FrmSaldosMaria
             Next
 
 
-            ImportarASQLiteEmbarquesgoogle(filteredDataTable)
+            Dim filteredView As New DataView(filteredDataTable)
+            Dim filteredTable As DataTable = filteredView.ToTable(False, "embarque", "ofi", "n° de despacho")
+
+            Dim DTPlanillaCatalent As New DataTable
+            DTPlanillaCatalent = ObtenerArchivoExcelPlanillaMariaCatalent()
+
+
+            filteredTable.Columns.Add("Pago")
+            For Each drwfil As DataRow In filteredTable.Rows
+                For Each drwcat In DTPlanillaCatalent.Rows
+                    If drwfil("EMBARQUE").ToString = drwcat("emb").ToString Then
+                        Dim pagoValue As Double
+                        If Double.TryParse(drwcat("pagos").ToString, pagoValue) Then
+                            drwfil("Pago") = pagoValue.ToString("F2")
+                        End If
+                    End If
+                Next
+            Next
+
+            DgvEmbGoogle.DataSource = filteredTable
 
 
         Else
@@ -308,41 +315,46 @@ Public Class FrmSaldosMaria
             MessageBox.Show("El archivo no contiene al menos tres hojas de cálculo.")
 
         End If
-    End Sub
+    End Function
 
-    Public Sub CargarArchivoExcel()
+
+
+
+
+
+    Public Shared Function ObtenerArchivoExcelPlanillaMariaCatalent() As DataTable
         Dim archivoExcel As String = "\\aleph-server-pc\SERVER NUEVO\Pc52\MARIA CATALENT.xls"
         Dim cadenaConexion As String = "Provider=Microsoft.ACE.OleDb.12.0;Data Source=" & archivoExcel & ";Extended Properties='Excel 8.0;HDR=YES;'"
         Dim añoActual As Integer = DateTime.Now.Year
-        Dim consultaSQL As String = "SELECT emb, Fecha, pagos FROM [CT$] WHERE emb IS NOT NULL AND YEAR(Fecha) = " & añoActual
+        Dim consultaSQL As String = "SELECT emb, Fecha, pagos, NroDespacho FROM [CT$] WHERE emb IS NOT NULL AND YEAR(Fecha) = " & añoActual
 
-        If Not VerificarRutaArchivo(archivoExcel) Then
-            archivoExcel = SeleccionarArchivoExcel()
-            If archivoExcel Is Nothing Then
-                Return
-            End If
-        End If
-
-        cadenaConexion = "Provider=Microsoft.ACE.OleDb.12.0;Data Source=" & archivoExcel & ";Extended Properties='Excel 8.0;HDR=YES;'"
 
         Using conexion As New OleDbConnection(cadenaConexion)
             Try
-                conexion.Open()
-                Using adaptador As New OleDbDataAdapter(consultaSQL, conexion)
-                    Dim dt As New DataTable()
-                    adaptador.Fill(dt)
 
-                    ActualizarBaseDatos(dt)
+                conexion.Open()
+
+                Using comando As New OleDbCommand(consultaSQL, conexion)
+
+                    Using adaptador As New OleDbDataAdapter(comando)
+                        Dim dtPlanillaCatalent As New DataTable()
+                        adaptador.Fill(dtPlanillaCatalent)
+
+
+                        Return dtPlanillaCatalent
+
+                    End Using
                 End Using
             Catch ex As Exception
-                ' Manejar cualquier excepción
-                MessageBox.Show("Error al cargar el archivo de Excel: " & ex.Message)
+
+                Console.WriteLine("Error al cargar el archivo Excel: " & ex.Message)
             Finally
-                ' Cerrar la conexión
+
                 conexion.Close()
             End Try
         End Using
-    End Sub
+    End Function
+
 
     Private Function VerificarRutaArchivo(ByVal rutaArchivo As String) As Boolean
         Return File.Exists(rutaArchivo)
@@ -360,197 +372,6 @@ Public Class FrmSaldosMaria
         End If
     End Function
 
-
-    '********  Insertar Veps  ********
-
-    Private Sub InsertarRegistrosEnSQLite(dataTable As DataTable)
-        ' Ruta y nombre de la base de datos SQLite
-        Dim dbPath As String = "C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db"
-
-        ' Cadena de conexión a la base de datos SQLite
-        Dim connectionString As String = $"Data Source={dbPath};Version=3;"
-
-        ' Crear la conexión a la base de datos SQLite
-        Using connection As New SQLiteConnection(connectionString)
-            connection.Open()
-
-            ' Verificar y insertar los registros
-            For Each row As DataRow In dataTable.Rows
-                If Not ExisteRegistroSQLite(connection, row) Then
-                    InsertarRegistroSQLite(connection, row)
-                End If
-            Next
-        End Using
-    End Sub
-    Private Function ExisteRegistroSQLite(connection As SQLiteConnection, row As DataRow) As Boolean
-        ' Sentencia SQL para buscar un registro en SQLite
-        Dim selectQuery As String = "SELECT COUNT(*) FROM Veps WHERE FECHA = @fecha AND EMBARQUE = @embarque AND IMPORTE = @importe AND NVEP = @nvep AND USUARIO = @usuario;"
-
-        ' Crear el comando SQL con los parámetros
-        Using command As New SQLiteCommand(selectQuery, connection)
-            command.Parameters.AddWithValue("@fecha", row("FECHA").ToString())
-            command.Parameters.AddWithValue("@embarque", row("EMBARQUE").ToString())
-            command.Parameters.AddWithValue("@importe", row("IMPORTE").ToString().Replace(",", "."))
-            command.Parameters.AddWithValue("@nvep", row("N°VEP").ToString())
-            command.Parameters.AddWithValue("@usuario", row("USUARIO").ToString())
-
-            ' Ejecutar la consulta y obtener el resultado
-            Dim result As Integer = Convert.ToInt32(command.ExecuteScalar())
-
-            ' Si el resultado es mayor a 0, significa que el registro ya existe
-            Return result > 0
-        End Using
-    End Function
-    Private Sub InsertarRegistroSQLite(connection As SQLiteConnection, row As DataRow)
-        ' Sentencia SQL para insertar un registro en SQLite
-        Dim insertQuery As String = "INSERT INTO Veps (FECHA, EMBARQUE, IMPORTE, NVEP, USUARIO) VALUES (@fecha, @embarque, @importe, @nvep, @usuario);"
-
-        ' Crear el comando SQL con los parámetros
-        Using command As New SQLiteCommand(insertQuery, connection)
-            command.Parameters.AddWithValue("@fecha", row("FECHA").ToString())
-            command.Parameters.AddWithValue("@embarque", row("EMBARQUE").ToString())
-            command.Parameters.AddWithValue("@importe", row("IMPORTE").ToString().Replace(",", "."))
-            command.Parameters.AddWithValue("@nvep", row("N°VEP").ToString())
-            command.Parameters.AddWithValue("@usuario", row("USUARIO").ToString())
-
-            ' Ejecutar el comando SQL para insertar el registro
-            command.ExecuteNonQuery()
-        End Using
-    End Sub
-
-    '************      Insertar planilla Google   *************
-
-
-    Public Sub ImportarASQLiteEmbarquesgoogle(dataTable As DataTable)
-        ' Ruta de la base de datos SQLite
-        Dim rutaBaseDatos As String = "C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db"
-
-        ' Cadena de conexión a la base de datos SQLite
-        Dim connectionString As String = "Data Source=" & rutaBaseDatos & ";Version=3;"
-
-        ' Conexión a la base de datos SQLite
-        Using conn As New SQLiteConnection(connectionString)
-            conn.Open()
-
-            ' Insertar registros en la base de datos
-            For Each row As DataRow In dataTable.Rows
-                Dim emb As String = row("Embarque").ToString()
-                Dim despacho As String = row("N° De Despacho").ToString()
-
-                ' Verificar si el registro ya existe en la base de datos
-                Using cmd As New SQLiteCommand(conn)
-                    cmd.CommandText = "SELECT COUNT(*) FROM embarquesgoogle WHERE Embarque = @Embarque AND NroDespacho = @Despacho"
-                    cmd.Parameters.AddWithValue("@Embarque", emb)
-                    cmd.Parameters.AddWithValue("@Despacho", despacho)
-                    Dim count As Integer = Convert.ToInt32(cmd.ExecuteScalar())
-
-                    If count = 0 Then
-                        ' Insertar el registro si no existe
-                        cmd.CommandText = "INSERT INTO embarquesgoogle (Embarque, NroDespacho) VALUES (@Embarque, @Despacho)"
-                        cmd.ExecuteNonQuery()
-                    End If
-                End Using
-            Next
-
-            ' Cerrar la conexión
-            conn.Close()
-        End Using
-    End Sub
-    Public Sub ActualizarBaseDatos(ByVal dt As DataTable)
-        Dim cadenaConexion As String = "Data Source=C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db;Version=3;"
-        Dim añoActual As Integer = DateTime.Now.Year
-
-        Using conexion As New SQLiteConnection(cadenaConexion)
-            Try
-                conexion.Open()
-
-                For Each fila As DataRow In dt.Rows
-                    Dim emb As String = fila("emb").ToString()
-                    Dim fecha As DateTime = Convert.ToDateTime(fila("Fecha")).Date ' Obtener solo la fecha sin la parte de la hora
-                    Dim pagos As Decimal = Convert.ToDecimal(fila("pagos"))
-
-                    ' Verificar si el valor de "emb" ya existe en la base de datos
-                    Dim existe As Boolean = False
-                    Dim verificarSQL As String = "SELECT emb FROM mariacatalent WHERE emb = @emb"
-                    Using verificarCmd As New SQLiteCommand(verificarSQL, conexion)
-                        verificarCmd.Parameters.AddWithValue("@emb", emb)
-                        Dim resultado As Object = verificarCmd.ExecuteScalar()
-                        If resultado IsNot Nothing Then
-                            existe = True
-                        End If
-                    End Using
-
-                    If Not existe Then
-                        ' Insertar un nuevo registro
-                        Dim insertarSQL As String = "INSERT INTO mariacatalent (emb, Fecha, pagos) VALUES (@emb, @fecha, @pagos)"
-                        Using insertarCmd As New SQLiteCommand(insertarSQL, conexion)
-                            insertarCmd.Parameters.AddWithValue("@emb", emb)
-                            insertarCmd.Parameters.AddWithValue("@fecha", fecha.ToString("yyyy-MM-dd")) ' Formatear la fecha como "yyyy-MM-dd"
-                            insertarCmd.Parameters.AddWithValue("@pagos", Decimal.Round(pagos, 2))
-                            insertarCmd.ExecuteNonQuery()
-                        End Using
-                    End If
-                Next fila
-            Catch ex As Exception
-                ' Manejar cualquier excepción
-                MessageBox.Show("Error al actualizar la base de datos: " & ex.Message)
-            Finally
-                ' Cerrar la conexión
-                conexion.Close()
-            End Try
-        End Using
-    End Sub
-
-    Private Function Obtenerdatosparagrid()
-
-
-        DgvEmbGoogle.DataSource = ObtenerDataTableEmbarquesgoogle()
-        DgvVeps.DataSource = ObtenerVeps()
-        DgvBase.DataSource = ObtenerVepsConDiferenciaCero(ObtenerDataTableEmbarquesgoogle)
-
-        'DgvBase.DataSource = ObtenerBase()
-        'dgvdespachos.DataSource = ObtenerDespachos()
-    End Function
-
-
-
-    Public Function ObtenerDataTableEmbarquesgoogle() As DataTable
-        Dim dataTable As New DataTable()
-
-        ' Ruta de la base de datos SQLite
-        Dim rutaBaseDatos As String = "C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db"
-
-        ' Cadena de conexión a la base de datos SQLite
-        Dim connectionString As String = "Data Source=" & rutaBaseDatos & ";Version=3;"
-
-        ' Conexión a la base de datos SQLite
-        Using conn As New SQLiteConnection(connectionString)
-            conn.Open()
-
-            Dim selectQuery As String = "SELECT embarquesgoogle.*,mariacatalent.fecha ,mariacatalent.pagos AS PagosTotal, veps.importe AS ImporteVeps, (mariacatalent.pagos - veps.importe) AS diferencia " &
-                                    "FROM (embarquesgoogle " &
-                                    "INNER JOIN mariacatalent ON embarquesgoogle.embarque = mariacatalent.emb) " &
-                                    "INNER JOIN veps ON embarquesgoogle.embarque = veps.embarque " &
-                                    "WHERE mariacatalent.fecha >= '2023-01-01' AND embarquesgoogle.NroDespacho NOT IN (SELECT Numerodespacho FROM DespachosOficializados) " &
-                                    "GROUP BY embarquesgoogle.embarque"
-
-
-
-
-
-            Using cmd As New SQLiteCommand(selectQuery, conn)
-                ' Crear un adaptador de datos para ejecutar la consulta y llenar el DataTable
-                Using adapter As New SQLiteDataAdapter(cmd)
-                    adapter.Fill(dataTable)
-                End Using
-            End Using
-
-            ' Cerrar la conexión
-            conn.Close()
-        End Using
-
-        Return dataTable
-    End Function
 
     Public Function ObtenerVeps() As DataTable
         Dim dataTable As New DataTable()
@@ -584,87 +405,6 @@ Public Class FrmSaldosMaria
         Return dataTable
     End Function
 
-
-
-
-
-
-
-    'Public Function ObtenerBase() As DataTable
-    '    Dim dataTable As New DataTable()
-
-    '    ' Ruta de la base de datos SQLite
-    '    Dim rutaBaseDatos As String = "C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db"
-
-    '    ' Cadena de conexión a la base de datos SQLite
-    '    Dim connectionString As String = "Data Source=" & rutaBaseDatos & ";Version=3;"
-
-    '    ' Conexión a la base de datos SQLite
-    '    Using conn As New SQLiteConnection(connectionString)
-    '        conn.Open()
-
-    '        ' Consulta para obtener los registros de la tabla "base" con fechas posteriores a "2023-02-01"
-    '        ' y un campo adicional "diferencia", que es la resta del importe de "base" y la suma de importes de "veps" para el mismo "nvep"
-    '        ' También se obtiene la sumatoria de importes de "veps" para el mismo "nvep"
-    '        Dim selectQuery As String = "SELECT b.*, (b.importe - COALESCE(v.total_importes, 0)) AS diferencia, COALESCE(v.total_importes, 0) AS sumatoria " &
-    '                                "FROM base AS b " &
-    '                                "LEFT JOIN (SELECT nvep, SUM(importe) AS total_importes FROM veps GROUP BY nvep) AS v ON b.nvep = v.nvep " &
-    '                                "WHERE b.fecha > '2023-01-01'"
-
-    '        Using cmd As New SQLiteCommand(selectQuery, conn)
-    '            ' Crear un adaptador de datos para ejecutar la consulta y llenar el DataTable
-    '            Using adapter As New SQLiteDataAdapter(cmd)
-    '                adapter.Fill(dataTable)
-    '            End Using
-    '        End Using
-
-    '        ' Cerrar la conexión
-    '        conn.Close()
-    '    End Using
-
-    '    Return dataTable
-    'End Function
-
-    'Public Function ObtenerDespachos() As DataTable
-    '    Dim dataTable As New DataTable()
-
-    '    ' Ruta de la base de datos SQLite
-    '    Dim rutaBaseDatos As String = "C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db"
-
-    '    ' Cadena de conexión a la base de datos SQLite
-    '    Dim connectionString As String = "Data Source=" & rutaBaseDatos & ";Version=3;"
-
-    '    ' Conexión a la base de datos SQLite
-    '    Using conn As New SQLiteConnection(connectionString)
-    '        conn.Open()
-
-    '        ' Consulta para obtener los registros de la tabla "base" con un campo adicional "sumatoria" y "diferencia"
-    '        ' que involucra los datos de la tabla "DespachosOficializados", con filtro de fecha desde "2023-01-01"
-    '        Dim selectQuery As String = "SELECT base.*, " &
-    '                                    "SUM(DespachosOficializados.Descontado) AS sumatoria, " &
-    '                                    "(base.importe - SUM(DespachosOficializados.Descontado)) AS diferencia " &
-    '                                    "FROM base " &
-    '                                    "LEFT JOIN DespachosOficializados ON base.nvep = DespachosOficializados.DepositoUsado " &
-    '                                    "WHERE base.fecha >= '2023-01-01' " &
-    '                                    "GROUP BY base.nvep"
-
-    '        Using cmd As New SQLiteCommand(selectQuery, conn)
-    '            ' Crear un adaptador de datos para ejecutar la consulta y llenar el DataTable
-    '            Using adapter As New SQLiteDataAdapter(cmd)
-    '                adapter.Fill(dataTable)
-    '            End Using
-    '        End Using
-
-    '        ' Cerrar la conexión
-    '        conn.Close()
-    '    End Using
-
-    '    Return dataTable
-    'End Function
-
-
-
-
     Private Sub SetDefaultDateFormat()
         Dim cultureInfo As New CultureInfo("en-US") ' Puedes ajustar el código de idioma según tus necesidades
         cultureInfo.DateTimeFormat.ShortDatePattern = "yyyy-MM-dd"
@@ -673,57 +413,6 @@ Public Class FrmSaldosMaria
         System.Threading.Thread.CurrentThread.CurrentCulture = cultureInfo
         System.Threading.Thread.CurrentThread.CurrentUICulture = cultureInfo
     End Sub
-
-    Public Function ObtenerVepsConDiferenciaCero(dataTableEmbarquesgoogle As DataTable) As DataTable
-        Dim dataTable As New DataTable()
-
-        ' Ruta de la base de datos SQLite
-        Dim rutaBaseDatos As String = "C:\Users\Cristian\Source\Repos\SaldosMaria\SaldosMaria\SaldosMaria.db"
-
-        ' Cadena de conexión a la base de datos SQLite
-        Dim connectionString As String = "Data Source=" & rutaBaseDatos & ";Version=3;"
-
-        ' Obtener los registros de la función ObtenerDataTableEmbarquesgoogle() con diferencia cero
-        Dim registrosConDiferenciaCero() As DataRow = dataTableEmbarquesgoogle.Select("diferencia = 0")
-
-        ' Obtener los registros de la función ObtenerVeps() correspondientes a los embarques con diferencia cero
-        Using conn As New SQLiteConnection(connectionString)
-            conn.Open()
-
-            Dim selectQuery As String = "SELECT Veps.fecha, Veps.embarque, embarquesgoogle.NroDespacho, Veps.importe, Veps.nvep " &
-                                    "FROM Veps " &
-                                    "INNER JOIN embarquesgoogle ON Veps.embarque = embarquesgoogle.embarque " &
-                                    "WHERE embarquesgoogle.NroDespacho NOT IN (SELECT Numerodespacho FROM DespachosOficializados) " &
-                                    "AND embarquesgoogle.embarque IN (" & String.Join(",", registrosConDiferenciaCero.Select(Function(row) "'" & row("embarque") & "'")) & ")"
-
-            Using cmd As New SQLiteCommand(selectQuery, conn)
-                ' Crear un adaptador de datos para ejecutar la consulta y llenar el DataTable
-                Using adapter As New SQLiteDataAdapter(cmd)
-                    adapter.Fill(dataTable)
-                End Using
-            End Using
-
-            ' Recorrer los registros obtenidos y realizar las actualizaciones
-            For Each row As DataRow In dataTable.Rows
-                Dim fechaOficializacion As String = DateTime.Now.ToString("yyyy-MM-dd") ' Obtener la fecha actual
-                Dim numeroDespacho As String = row("NroDespacho").ToString()
-                Dim depositoUsado As Integer = 0 ' Reemplaza con el valor correcto
-                Dim descontado As Decimal = CDec(row("importe"))
-
-                ' Actualizar los despachos oficializados
-                If ActualizarDespachosOficializados(fechaOficializacion, numeroDespacho, depositoUsado, descontado) Then
-                    Dim numeroVEP As String = row("nvep").ToString()
-                    ' Actualizar el saldo
-                    ActualizarSaldo(numeroVEP, descontado)
-                End If
-            Next
-
-            ' Cerrar la conexión
-            conn.Close()
-        End Using
-
-        Return dataTable
-    End Function
 
     Public Function ActualizarSaldo(ByVal numeroVEP As String, ByVal importeDescontar As Decimal) As Boolean
         Try
@@ -743,28 +432,6 @@ Public Class FrmSaldosMaria
             Dim cm As New SQLiteCommand("UPDATE BASE SET SALDO = SALDO - @importe WHERE NVEP = @numeroVEP", cn)
             cm.Parameters.AddWithValue("@importe", importeDescontar)
             cm.Parameters.AddWithValue("@numeroVEP", numeroVEP)
-            cm.ExecuteNonQuery()
-
-            cn.Close()
-
-            Return True
-
-        Catch ex As Exception
-            MessageBox.Show(ex.ToString & " Verifique su conexión a la base de datos.")
-            Return False
-        End Try
-    End Function
-
-    Public Function ActualizarDespachosOficializados(ByVal fechaOficializacion As String, ByVal numeroDespacho As String, ByVal depositoUsado As Integer, ByVal descontado As Decimal) As Boolean
-        Try
-            Dim cn As New SQLiteConnection("Data Source=C:\Users\Cristian\source\repos\SaldosMaria\SaldosMaria\SaldosMaria.db;Version=3;")
-            cn.Open()
-
-            Dim cm As New SQLiteCommand("UPDATE DespachosOficializados SET FechaOficializacion = @fechaOficializacion, Descontado = @descontado WHERE Numerodespacho = @numeroDespacho AND DepositoUsado = @depositoUsado", cn)
-            cm.Parameters.AddWithValue("@fechaOficializacion", fechaOficializacion)
-            cm.Parameters.AddWithValue("@descontado", descontado)
-            cm.Parameters.AddWithValue("@numeroDespacho", numeroDespacho)
-            cm.Parameters.AddWithValue("@depositoUsado", depositoUsado)
             cm.ExecuteNonQuery()
 
             cn.Close()
